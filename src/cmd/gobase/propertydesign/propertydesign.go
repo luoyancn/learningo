@@ -3,6 +3,8 @@ package main
 import (
 	"designpatterns"
 	"fmt"
+
+	uuid "github.com/satori/go.uuid"
 )
 
 func main() {
@@ -12,4 +14,6 @@ func main() {
 
 	fmt.Printf("guest config %v\n", config)
 	fmt.Printf("root config %v\n", root_config)
+
+	fmt.Printf("Uuid is %v\n", uuid.NewV4().String())
 }
