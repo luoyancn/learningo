@@ -73,17 +73,18 @@ func main() {
 	fmt.Printf("%v\n", string(ssh_out))
 	defer new_session.Close()
 
-	success := make(chan bool)
+	success := make(chan struct{})
 	go func() {
 		err = new_session.Run("dnf update -y")
-		success <- true
+		success <- struct{}{}
 	}()
 
+dnf_loop:
 	for {
 		select {
 		case <-success:
 			fmt.Println("excute end")
-			return
+			break dnf_loop
 		case <-time.Tick(1 * time.Second):
 			fmt.Println("Waiting the executing end")
 		}

@@ -96,7 +96,7 @@ func main() {
 		fmt.Printf("Cannot query with prepare sql string :%v\n", err)
 		os.Exit(2)
 	}
-	fmt.Printf("uuid%s:\t%s\n", uuid_str, hostname)
+	fmt.Printf("uuid %s:\t%s\n", uuid_str, hostname)
 
 	fmt.Println(time.Now().Format("2006-01-02 15:04:05"))
 	fmt.Println(time.Now().Format("2006年01月02日 15:04:05"))
