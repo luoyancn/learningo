@@ -45,7 +45,8 @@ func filter2(in chan int, prime int) chan int {
 	out := make(chan int)
 	go func() {
 		for {
-			if i := <-in; 0 != i%prime {
+			i := <-in
+			if 0 != i%prime {
 				out <- i
 			}
 		}
@@ -75,6 +76,7 @@ func emit(ch chan string) {
 	}
 	close(ch)
 }
+
 func main() {
 	sieve1()
 
