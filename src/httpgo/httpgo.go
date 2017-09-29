@@ -29,33 +29,34 @@ func HttpGoHandler(writer http.ResponseWriter, request *http.Request) {
 }
 
 func go_get_handler(writer http.ResponseWriter, request *http.Request) {
-	err := request.ParseForm()
-	if nil != err {
-		http.Error(writer, "Cannot parse the http request\n",
-			http.StatusBadRequest)
-	}
-	poem_name := request.Form["name"]
-	if 0 == len(poem_name) {
+	poem_name := request.Form.Get("name")
+	if "" == poem_name {
 		fmt.Fprint(writer, "Visit the poem list\n")
 		return
 	}
-	fmt.Fprintf(writer, "Poem %s coming soon\n", poem_name[0])
+	fmt.Fprintf(writer, "Poem %s coming soon\n", poem_name)
 }
 
 func go_post_handler(writer http.ResponseWriter, request *http.Request) {
 	body, err := ioutil.ReadAll(request.Body)
 	if err != nil {
-		http.Error(writer, "Only json-liked request body is accepted\n",
+		http.Error(writer, "Failed to parse the body in request\n",
 			http.StatusBadRequest)
 		return
 	}
 	var req_body reqbody
 	err = json.Unmarshal([]byte(body), &req_body)
-	if err != nil || "" == req_body.Name || 0 == req_body.Id {
-		http.Error(writer, "Failed to parse the request body in request\n",
+	if err != nil {
+		http.Error(writer, "Only json-liked body accepted\n",
 			http.StatusBadRequest)
 		return
 	}
+	if "" == req_body.Name || 0 == req_body.Id {
+		http.Error(writer, "Missing id or name in request body\n",
+			http.StatusBadRequest)
+		return
+	}
+
 	writer.WriteHeader(http.StatusAccepted)
 	fmt.Fprintf(writer, "Recevied request body %v\n", string(body))
 }
