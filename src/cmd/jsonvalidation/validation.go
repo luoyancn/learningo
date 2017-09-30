@@ -6,4 +6,5 @@ import (
 
 func main() {
 	jsonschemavalidation.ValidateJsonSchema()
+	jsonschemavalidation.ValidateJsonSchema_complex()
 }
