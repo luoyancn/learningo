@@ -2,33 +2,16 @@ package jsonschemavalidation
 
 import (
 	"fmt"
+	"strings"
 
 	"github.com/xeipuuv/gojsonschema"
 )
 
-/**
-type uuid_format_checker struct{}
-
-func (this uuid_format_checker) IsFormat(input interface{}) bool {
-	uuid_string, ok := input.(string)
-	if false == ok {
-		return false
-	}
-	_, err := uuid.FromString(uuid_string)
-	if nil != err {
-		fmt.Printf("ERROR: %v\n", err)
-		return false
-	}
-	return true
-}
-gojsonschema.FormatCheckers.Add("uuid", uuid_format_checker{})
-*/
-
-var user_json_schema = `
+const user_json_schema = `
 	{"type": "string"}
 `
 
-var complex_json_schema = `
+const complex_json_schema = `
 {
 	"title": "Person",
 	"type": "object",
@@ -76,32 +59,49 @@ var complex_json_schema = `
 `
 
 func ValidateJsonSchema() {
-	schema_loader := gojsonschema.NewStringLoader(user_json_schema)
-	data_loader := gojsonschema.NewStringLoader(`"lucifer"`)
-	result, err := gojsonschema.Validate(schema_loader, data_loader)
-	if nil != err {
-		fmt.Printf("The document is not valid. see errors :\n")
-		for _, err := range result.Errors() {
-			fmt.Printf("- %s\n", err)
-		}
+	schema := gojsonschema.NewStringLoader(user_json_schema)
+	docs := gojsonschema.NewStringLoader(`"lucifer"`)
+	res, err := gojsonschema.Validate(schema, docs)
+	if err != nil {
+		fmt.Printf("ERROR:%v\n", err)
 		return
 	}
-	fmt.Printf("The document is valid\n")
+
+	if !res.Valid() {
+		var errs []string
+		errs = append(errs, fmt.Sprintln(
+			"Input is invalid, following errors found:"))
+		for _, desc := range res.Errors() {
+			errs = append(errs, fmt.Sprintf("- %s", desc))
+		}
+		fmt.Println(strings.Join(errs, "\n"))
+		return
+	}
+	fmt.Println("The docs is valid!")
 }
 
-func ValidateJsonSchema_complex() {
-	schema_loader := gojsonschema.NewStringLoader(complex_json_schema)
-	data_loader := gojsonschema.NewStringLoader(
-		`{"id": "c9b83353-5005-4d31-b21f-e99f3ae33386",
-			"name": "zhangjl", "sex": "men", "desc": "zhangjl",
-			"married": true, "addresses": ["beijing", "chongqing", "wuhan"]}`)
-	result, err := gojsonschema.Validate(schema_loader, data_loader)
-	if nil != err {
-		fmt.Printf("The document is not valid. see errors :\n")
-		for _, err := range result.Errors() {
-			fmt.Printf("- %s\n", err)
-		}
+func Validate_complext_schema() {
+	schema := gojsonschema.NewStringLoader(complex_json_schema)
+	docs := gojsonschema.NewStringLoader(
+		`{"name": "zhangjl", "sex": "men",
+		"id": "299dbc8d-0bca-4189-9450-2f5bdf3aaf80",
+		"address": ["beijing", "chongqing", "wuhan"],
+		"married": true, "email": "zhangjl@hasp.io"}`)
+	res, err := gojsonschema.Validate(schema, docs)
+	if err != nil {
+		fmt.Printf("ERROR:%v\n", err)
 		return
 	}
-	fmt.Printf("The document is valid\n")
+
+	if !res.Valid() {
+		var errs []string
+		errs = append(errs, fmt.Sprintln(
+			"Input is invalid, following errors found:"))
+		for _, desc := range res.Errors() {
+			errs = append(errs, fmt.Sprintf("- %s", desc))
+		}
+		fmt.Println(strings.Join(errs, "\n"))
+		return
+	}
+	fmt.Println("The docs is valid!")
 }
