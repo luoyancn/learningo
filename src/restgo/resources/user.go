@@ -8,11 +8,12 @@ import (
 	"github.com/rs/xmux"
 )
 
-func UserLists(ctx context.Context, respwriter http.ResponseWriter,
+func user_lists(ctx context.Context, respwriter http.ResponseWriter,
 	req *http.Request) {
 	fmt.Fprintf(respwriter, "List all of users !!!\n")
 }
-func UserGet(ctx context.Context, respwriter http.ResponseWriter,
+
+func user_get(ctx context.Context, respwriter http.ResponseWriter,
 	req *http.Request) {
 	if !check_valid_uuid(xmux.Param(ctx, "userid")) {
 		respwriter.WriteHeader(http.StatusBadRequest)
@@ -21,19 +22,19 @@ func UserGet(ctx context.Context, respwriter http.ResponseWriter,
 	}
 }
 
-func UserCreate(ctx context.Context, respwriter http.ResponseWriter,
+func user_create(ctx context.Context, respwriter http.ResponseWriter,
 	req *http.Request) {
 	fmt.Fprintf(respwriter, "Get the user which id equals %s !!!\n",
 		xmux.Param(ctx, "userid"))
 }
 
-func UserUpdate(ctx context.Context, respwriter http.ResponseWriter,
+func user_update(ctx context.Context, respwriter http.ResponseWriter,
 	req *http.Request) {
 	fmt.Fprintf(respwriter, "Get the user which id equals %s !!!\n",
 		xmux.Param(ctx, "userid"))
 }
 
-func UserDelete(ctx context.Context, respwriter http.ResponseWriter,
+func user_delete(ctx context.Context, respwriter http.ResponseWriter,
 	req *http.Request) {
 	fmt.Fprintf(respwriter, "Get the user which id equals %s !!!\n",
 		xmux.Param(ctx, "userid"))

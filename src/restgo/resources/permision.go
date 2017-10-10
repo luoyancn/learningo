@@ -8,14 +8,14 @@ import (
 	"github.com/rs/xmux"
 )
 
-func PermisionList(ctx context.Context, respwriter http.ResponseWriter,
+func permision_list(ctx context.Context, respwriter http.ResponseWriter,
 	req *http.Request) {
 	fmt.Fprintf(
 		respwriter, "Get the user`s permision which id equals %s !!!\n",
 		xmux.Param(ctx, "userid"))
 }
 
-func PermisionGet(ctx context.Context, respwriter http.ResponseWriter,
+func permision_get(ctx context.Context, respwriter http.ResponseWriter,
 	req *http.Request) {
 	fmt.Fprintf(
 		respwriter, "The user`s permision which id equals %s is %s !!!\n",

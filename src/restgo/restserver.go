@@ -13,22 +13,22 @@ import (
 )
 
 var once sync.Once
-var RootMux *xmux.Mux
+var rootMux *xmux.Mux
 
 func init() {
 	once.Do(func() {
-		RootMux = xmux.New()
-		RootMux.GET("/", xhandler.HandlerFuncC(Root))
-		resources.InitRouter(RootMux)
+		rootMux = xmux.New()
+		rootMux.GET("/", xhandler.HandlerFuncC(root))
+		resources.InitRouter(rootMux)
 	})
 }
 
-func Root(ctx context.Context, respwriter http.ResponseWriter,
+func root(ctx context.Context, respwriter http.ResponseWriter,
 	req *http.Request) {
 	fmt.Fprintf(respwriter, "Welcome to the rest world of go !!!\n")
 }
 
 func Serve() {
 	log.Fatal(http.ListenAndServe(
-		":8080", xhandler.New(context.Background(), RootMux)))
+		":8080", xhandler.New(context.Background(), rootMux)))
 }
