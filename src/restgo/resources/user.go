@@ -5,11 +5,14 @@ import (
 	"fmt"
 	"net/http"
 
+	"restgo/db"
+
 	"github.com/rs/xmux"
 )
 
 func user_lists(ctx context.Context, respwriter http.ResponseWriter,
 	req *http.Request) {
+	db.UserList()
 	fmt.Fprintf(respwriter, "List all of users !!!\n")
 }
 
