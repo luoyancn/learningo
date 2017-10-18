@@ -23,6 +23,14 @@ func InitRouter(root_mux *xmux.Mux) {
 	user_mux.PUT("/:userid", xhandler.HandlerFuncC(user_update))
 	user_mux.DELETE("/:userid", xhandler.HandlerFuncC(user_delete))
 
+	role_mux := root_mux.NewGroup("/roles")
+	role_mux.GET("/", xhandler.HandlerFuncC(role_lists))
+	role_mux.GET("/:roleid", xhandler.HandlerFuncC(role_get))
+	role_mux.POST("/", xhandler.HandlerFuncC(role_create))
+	role_mux.POST("/:roleid", xhandler.HandlerFuncC(role_update))
+	role_mux.PUT("/:roleid", xhandler.HandlerFuncC(role_update))
+	role_mux.DELETE("/:roleid", xhandler.HandlerFuncC(role_delete))
+
 	permision_mux := user_mux.NewGroup("/:userid/permision")
 	permision_mux.GET("/", xhandler.HandlerFuncC(permision_list))
 	permision_mux.GET("/:permisionid", xhandler.HandlerFuncC(permision_get))
