@@ -15,12 +15,12 @@ func init() {
 	var err error
 	once.Do(func() {
 		orm_db, err = gorm.Open("mysql",
-			"golang:golang@tcp(192.168.137.30:3306)/golang")
+			"golang:golang@tcp(192.168.137.30:3306)/golang?parseTime=true")
 		if nil != err {
 			fmt.Printf("Cannot init mysql connection:%v\n", err)
 			orm_db = nil
 		}
-		orm_db.LogMode(true)
+		//orm_db.LogMode(true)
 	})
 }
 
@@ -37,7 +37,6 @@ func MigrateDB() {
 			"role_uuid", "roles(uuid)", "RESTRICT", "RESTRICT")
 	}
 
-	var query_user User
 	var query_role Role
 	user := User{Name: "zhangjl", Age: 29, Sex: "men"}
 	orm_db.Create(&user)
@@ -49,7 +48,16 @@ func MigrateDB() {
 		orm_db.Create(&role)
 		roleuuid = role.Uuid
 	}
-	orm_db.Where(&user).Find(&query_user)
-	orm_db.Create(&Assignment{UserUuId: query_user.Uuid, RoleUuId: roleuuid})
+	orm_db.Create(&Assignment{UserUuId: user.Uuid, RoleUuId: roleuuid})
 
+	var users Users
+	var roles Roles
+	orm_db.Find(&users)
+	for _, user := range users {
+		fmt.Printf("%v\n", user)
+	}
+	orm_db.Find(&roles)
+	for _, rol := range roles {
+		fmt.Printf("%v\n", rol)
+	}
 }

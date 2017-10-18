@@ -15,12 +15,12 @@ func init() {
 	var err error
 	once.Do(func() {
 		orm_db, err = gorm.Open("mysql",
-			"golang:golang@tcp(192.168.137.30:3306)/golang")
+			"golang:golang@tcp(192.168.137.30:3306)/golang?parseTime=true")
 		if nil != err {
 			fmt.Printf("Cannot init mysql connection:%v\n", err)
 			orm_db = nil
 		}
-		orm_db.LogMode(true)
+		//orm_db.LogMode(true)
 	})
 }
 
