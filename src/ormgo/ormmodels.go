@@ -26,10 +26,14 @@ type User struct {
 	Sex  string `gorm:"type:enum('men', 'women')"`
 }
 
+type Users []User
+
 type Role struct {
 	Base
 	RoleName string `gorm:"column:rolename;type:varchar(16);unique;not null"`
 }
+
+type Roles []Role
 
 type Assignment struct {
 	UserUuId string `gorm:"column:user_uuid;primary_key;type:varchar(36)"`
