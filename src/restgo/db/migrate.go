@@ -2,6 +2,7 @@ package db
 
 import (
 	"fmt"
+	"os"
 	"sync"
 
 	"github.com/jinzhu/gorm"
@@ -19,6 +20,7 @@ func init() {
 		if nil != err {
 			fmt.Printf("Cannot init mysql connection:%v\n", err)
 			orm_db = nil
+			os.Exit(-2)
 		}
 		//orm_db.LogMode(true)
 	})

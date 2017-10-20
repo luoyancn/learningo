@@ -15,15 +15,15 @@ type Base struct {
 	Uuid      string `gorm:"primary_key;type:varchar(36);not null"`
 	CreatedAt time.Time
 	UpdatedAt time.Time
-	DeletedAt *time.Time
 	Deleted   int `gorm:"type:tinyint(1);default null"`
 }
 
 type User struct {
 	Base
-	Name string `gorm:"type:varchar(36);not null"`
-	Age  int8   `gorm:"type:tinyint(3)"`
-	Sex  string `gorm:"type:enum('men', 'women')"`
+	DeletedAt *time.Time
+	Name      string `gorm:"type:varchar(36);not null"`
+	Age       int8   `gorm:"type:tinyint(3)"`
+	Sex       string `gorm:"type:enum('men', 'women')"`
 }
 
 type Users []User
