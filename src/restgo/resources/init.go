@@ -75,7 +75,7 @@ func InitRouter(root_mux *xmux.Mux) {
 	role_mux.POST("/", xhandler.HandlerFuncC(role_create))
 	role_mux.DELETE("/:roleid", xhandler.HandlerFuncC(role_delete))
 
-	root_mux.GET("/permisions/:userid",
+	root_mux.GET("/users/:userid/permisions",
 		xhandler.HandlerFuncC(permision_list))
 	root_mux.PUT("/permisions/:userid/roles/:roleid",
 		xhandler.HandlerFuncC(permision_create))

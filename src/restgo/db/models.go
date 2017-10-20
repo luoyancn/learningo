@@ -12,7 +12,8 @@ type BaseFromGorm struct {
 }
 
 type Base struct {
-	Uuid      string    `gorm:"primary_key;type:varchar(36);not null" json:"uuid"`
+	Uuid string `gorm:"primary_key;type:varchar(36);not null"
+				json:"uuid"`
 	CreatedAt time.Time `json:"created_at,string"`
 	UpdatedAt time.Time `json:"updated_at,string"`
 	Deleted   int       `gorm:"type:tinyint(1);default null" json:"-"`
@@ -32,7 +33,8 @@ type Users struct {
 
 type Role struct {
 	Base
-	RoleName string `gorm:"column:rolename;type:varchar(16);unique;not null" json:"rolename"`
+	RoleName string `gorm:"column:rolename;type:varchar(16);unique;not null"
+					json:"rolename"`
 }
 
 type Roles struct {
@@ -40,8 +42,10 @@ type Roles struct {
 }
 
 type Assignment struct {
-	UserUuId string `gorm:"column:user_uuid;primary_key;type:varchar(36)" json:"user_uuid"`
-	RoleUuId string `gorm:"column:role_uuid;primary_key;type:varchar(36)" json:"role_uuid"`
+	UserUuId string `gorm:"column:user_uuid;primary_key;type:varchar(36)"
+					json:"user_uuid"`
+	RoleUuId string `gorm:"column:role_uuid;primary_key;type:varchar(36)"
+					json:"role_uuid"`
 }
 
 type AssignmentUserRole struct {
