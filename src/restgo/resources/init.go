@@ -8,17 +8,8 @@ import (
 
 	"github.com/rs/xhandler"
 	"github.com/rs/xmux"
-	uuid "github.com/satori/go.uuid"
 	"github.com/xeipuuv/gojsonschema"
 )
-
-func check_valid_uuid(id string) bool {
-	_, err := uuid.FromString(id)
-	if nil != err {
-		return false
-	}
-	return true
-}
 
 var once_load sync.Once
 var create_user_loader gojsonschema.JSONLoader
