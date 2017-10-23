@@ -86,12 +86,19 @@ func user_update(ctx context.Context, respwriter http.ResponseWriter,
 		http.Error(respwriter, err.Error(), http.StatusInternalServerError)
 		return
 	}
-	user.Uuid = xmux.Param(ctx, "userid")
-	err = db.UserUpdate(user)
+	userid := xmux.Param(ctx, "userid")
+	err = db.UserUpdate(user, userid)
 	if nil != err {
-		respwriter.WriteHeader(http.StatusInternalServerError)
-		fmt.Fprintf(respwriter, "Intelnal ERROR:%v\n", err)
-		return
+		switch err.(type) {
+		case exceptions.NotFoundException:
+			respwriter.WriteHeader(http.StatusNotFound)
+			fmt.Fprintf(respwriter, "ERROR:%v\n", err)
+			return
+		default:
+			respwriter.WriteHeader(http.StatusInternalServerError)
+			fmt.Fprintf(respwriter, "Intelnal ERROR:%v\n", err)
+			return
+		}
 	}
 	respwriter.WriteHeader(http.StatusAccepted)
 }

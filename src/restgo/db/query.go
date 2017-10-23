@@ -57,9 +57,13 @@ func UserCreate(user User) error {
 	return nil
 }
 
-func UserUpdate(user User) error {
-	if err := orm_db.Model(&user).Update(user).Error; nil != err {
+func UserUpdate(user User, userid string) error {
+	var select_user User
+	if err := orm_db.Where("uuid = ?", userid).Find(&select_user).Model(
+		&select_user).Update(user).Error; nil != err {
 		switch err {
+		case gorm.ErrRecordNotFound:
+			return exceptions.NewNotFoundException("User", userid)
 		case gorm.ErrCantStartTransaction:
 		case gorm.ErrInvalidSQL:
 		case gorm.ErrInvalidTransaction:
