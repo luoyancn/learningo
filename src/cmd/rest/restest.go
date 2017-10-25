@@ -1,9 +1,9 @@
 package main
 
 import (
-	"restgo"
+	restgo "restgo/cmd"
 )
 
 func main() {
-	restgo.Serve()
+	restgo.Execute()
 }
