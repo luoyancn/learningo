@@ -1,23 +1,21 @@
 package restgo
 
 import (
-	"context"
+	_ "fastrest/conf"
+	"fastrest/db"
+	"fastrest/resources"
 	"fmt"
-	"net/http"
 	"os"
-	_ "restgo/conf"
-	"restgo/db"
-	"restgo/resources"
 	"sync"
 
-	"github.com/rs/xhandler"
-	"github.com/rs/xmux"
+	"github.com/buaazp/fasthttprouter"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
+	"github.com/valyala/fasthttp"
 )
 
 var once sync.Once
-var rootMux *xmux.Mux
+var router *fasthttprouter.Router
 
 var RootCmd = &cobra.Command{
 	Short: "The commands of rest application of golang",
@@ -46,15 +44,15 @@ func init() {
 		RootCmd.AddCommand(serveCmd)
 		RootCmd.PersistentFlags().StringVarP(
 			&configfile, "config", "c", "", "The full path of config file")
-		rootMux = xmux.New()
-		rootMux.GET("/", xhandler.HandlerFuncC(root))
-		resources.InitRouter(rootMux)
+
+		router = fasthttprouter.New()
+		router.GET("/", root)
+		resources.InitRouter(router)
 	})
 }
 
-func root(ctx context.Context, respwriter http.ResponseWriter,
-	req *http.Request) {
-	fmt.Fprintf(respwriter, "Welcome to the rest world of go !!!\n")
+func root(ctx *fasthttp.RequestCtx) {
+	fmt.Fprintf(ctx, "Welcome to the rest world of go !!!\n")
 }
 
 func read_config() {
@@ -68,8 +66,8 @@ func read_config() {
 func Serve(cmd *cobra.Command, args []string) {
 	read_config()
 	db.InitDbConnection()
-	http.ListenAndServe(viper.GetString("default.listen"),
-		xhandler.New(context.Background(), rootMux))
+	fasthttp.ListenAndServe(
+		viper.GetString("default.listen"), router.Handler)
 }
 
 func Sync(cmd *cobra.Command, args []string) {
