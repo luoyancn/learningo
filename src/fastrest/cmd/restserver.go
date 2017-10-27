@@ -58,12 +58,12 @@ func root(ctx *fasthttp.RequestCtx) {
 
 func read_config() {
 	viper.SetConfigFile(configfile)
-	logging.GetLogger()
 	if err := viper.ReadInConfig(); nil != err {
 		logging.WARNING.Printf("ERROR:%v\n", err)
 		logging.WARNING.Printf(
 			"And we will use default values of all config params!\n")
 	}
+	logging.GetLogger()
 }
 
 func Serve(cmd *cobra.Command, args []string) {

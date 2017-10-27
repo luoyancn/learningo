@@ -1,6 +1,7 @@
 package logging
 
 import (
+	"fmt"
 	"io"
 	"io/ioutil"
 	"log"
@@ -28,11 +29,14 @@ func initLog(traceHandle io.Writer, infoHandle io.Writer,
 }
 
 func GetLogger() {
+	fmt.Println(viper.GetString("default.log_file"))
+	fmt.Println(viper.GetString("default.debug"))
+	fmt.Println(viper.GetString("default.listen"))
 	logfile, err := os.OpenFile(
 		viper.GetString("default.log_file"),
 		os.O_RDWR|os.O_CREATE|os.O_APPEND, 0666)
 	if err != nil {
-		log.Fatalln("Fail to open log file")
+		log.Fatalln("%v\n", err)
 	}
 	//defer logfile.Close()
 	if viper.GetBool("default.debug") {
