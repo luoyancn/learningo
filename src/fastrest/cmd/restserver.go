@@ -3,6 +3,7 @@ package restgo
 import (
 	_ "fastrest/conf"
 	"fastrest/db"
+	"fastrest/logging"
 	"fastrest/resources"
 	"fmt"
 	"os"
@@ -57,9 +58,11 @@ func root(ctx *fasthttp.RequestCtx) {
 
 func read_config() {
 	viper.SetConfigFile(configfile)
+	logging.GetLogger()
 	if err := viper.ReadInConfig(); nil != err {
-		fmt.Printf("%v\n", err)
-		fmt.Println("And we will use default values of all config params!")
+		logging.WARNING.Printf("ERROR:%v\n", err)
+		logging.WARNING.Printf(
+			"And we will use default values of all config params!\n")
 	}
 }
 

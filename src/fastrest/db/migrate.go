@@ -1,6 +1,7 @@
 package db
 
 import (
+	"fastrest/logging"
 	"fmt"
 	"os"
 	"sync"
@@ -24,7 +25,10 @@ func InitDbConnection() {
 			orm_db = nil
 			os.Exit(-2)
 		}
-		orm_db.LogMode(viper.GetBool("database.debug"))
+		if viper.GetBool("database.debug") {
+			orm_db.LogMode(true)
+			orm_db.SetLogger(logging.DEBUG)
+		}
 		orm_db.DB().SetConnMaxLifetime(
 			viper.GetDuration("database.max_time") * time.Second)
 		orm_db.DB().SetMaxIdleConns(viper.GetInt("database.max_idle"))

@@ -1,6 +1,7 @@
 package resources
 
 import (
+	"fastrest/logging"
 	"fmt"
 	"strings"
 	"sync"
@@ -31,6 +32,7 @@ func valite_req_body(ctx *fasthttp.RequestCtx, str_body string,
 	req_body := gojsonschema.NewStringLoader(str_body)
 	res, err := gojsonschema.Validate(loader, req_body)
 	if err != nil {
+		logging.ERROR.Printf("%v\n", err)
 		ctx.Error("Only json-liked body accepted\n", fasthttp.StatusBadRequest)
 		return false
 	}
@@ -42,6 +44,7 @@ func valite_req_body(ctx *fasthttp.RequestCtx, str_body string,
 		for _, desc := range res.Errors() {
 			errs = append(errs, fmt.Sprintf("- %s", desc))
 		}
+		logging.ERROR.Printf("%v\n", strings.Join(errs, "\n"))
 		ctx.Error(strings.Join(errs, "\n"), fasthttp.StatusBadRequest)
 		return false
 	}
