@@ -6,6 +6,7 @@ import (
 	"fastrest/logging"
 	"fastrest/resources"
 	"fmt"
+	"log"
 	"os"
 	"sync"
 
@@ -59,8 +60,8 @@ func root(ctx *fasthttp.RequestCtx) {
 func read_config() {
 	viper.SetConfigFile(configfile)
 	if err := viper.ReadInConfig(); nil != err {
-		logging.WARNING.Printf("ERROR:%v\n", err)
-		logging.WARNING.Printf(
+		log.Printf("ERROR:%v\n", err)
+		log.Printf(
 			"And we will use default values of all config params!\n")
 	}
 	logging.GetLogger()
