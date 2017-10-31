@@ -44,8 +44,8 @@ func init() {
 		RootCmd.AddCommand(migrateCmd)
 		RootCmd.AddCommand(serveCmd)
 		RootCmd.PersistentFlags().StringVarP(
-			&configfile, "config", "c", "", "The full path of config file")
-
+			&configfile, "config-file", "c", "",
+			"The full path of config file")
 		router = fasthttprouter.New()
 		router.GET("/", root)
 		resources.InitRouter(router)
