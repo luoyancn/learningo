@@ -1,5 +1,5 @@
 bin/
 pkg/
-src/github.com/
-src/golang.org/
-vendor/
+src/vendor/*
+!src/vendor/vendor.json
+.cache/
