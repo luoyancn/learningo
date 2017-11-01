@@ -14,10 +14,8 @@
 package cli
 
 import (
-	"errors"
 	"net/url"
 	"os"
-	"strings"
 
 	"github.com/spf13/cobra"
 )
@@ -71,28 +69,34 @@ func init() {
 		"default", "The domain name of user")
 	RootCmd.PersistentFlags().StringVar(&project_domain, "project-domain",
 		"default", "The domain name of project")
+	RootCmd.MarkPersistentFlagRequired("user")
+	RootCmd.MarkPersistentFlagRequired("password")
+	RootCmd.MarkPersistentFlagRequired("project")
+	RootCmd.MarkPersistentFlagRequired("auth-url")
 	// Cobra also supports local flags, which will only run
 	// when this action is called directly.
 	// RootCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
 }
 
 func check_required(cmd *cobra.Command, args []string) error {
-	errs := []string{}
-	if "" == user {
-		errs = append(errs, "\"--user\" requires")
-	}
-	if "" == password {
-		errs = append(errs, "\"--password\" requires")
-	}
-	if "" == project {
-		errs = append(errs, "\"--project\" requires")
-	}
-	if "" == auth_url {
-		errs = append(errs, "\"--auth-url\" requires")
-	}
-	if len(errs) > 0 {
-		return errors.New(strings.Join(errs, "\n"))
-	}
+	/*
+		errs := []string{}
+		if "" == user {
+			errs = append(errs, "\"--user\" requires")
+		}
+		if "" == password {
+			errs = append(errs, "\"--password\" requires")
+		}
+		if "" == project {
+			errs = append(errs, "\"--project\" requires")
+		}
+		if "" == auth_url {
+			errs = append(errs, "\"--auth-url\" requires")
+		}
+		if len(errs) > 0 {
+			return errors.New(strings.Join(errs, "\n"))
+		}
+		/*/
 
 	_, err := url.ParseRequestURI(auth_url)
 	if nil != err {

@@ -18,7 +18,6 @@ import (
 	"fmt"
 	"openstack"
 	"os"
-	"strings"
 	"time"
 
 	uuid "github.com/satori/go.uuid"
@@ -31,7 +30,7 @@ var novaCmd = &cobra.Command{
 	Short: "The command of nova",
 	Long: `
 The commands of nova to request nova for vm instances.`,
-	PreRunE: check_nova,
+	//PreRunE: check_nova,
 }
 
 // bootCmd represents the boot command
@@ -73,12 +72,16 @@ func init() {
 	novaCmd.AddCommand(bootCmd)
 	novaCmd.AddCommand(listCmd)
 	novaCmd.PersistentFlags().StringVarP(&region, "region", "r", "", "The region name")
+	novaCmd.MarkPersistentFlagRequired("region")
 
 	bootCmd.Flags().StringVarP(&image, "image", "i", "", "The image id")
 	bootCmd.Flags().StringVarP(&flavor, "flavor", "f", "", "The flavor id")
 	bootCmd.Flags().StringVarP(&network, "network", "n", "", "The network id")
 	bootCmd.Flags().IntVarP(&size, "size", "s", 0,
 		"The size of block device, GB")
+	bootCmd.MarkFlagRequired("image")
+	bootCmd.MarkFlagRequired("flavor")
+	bootCmd.MarkFlagRequired("network")
 }
 
 func generate_common() (string, string) {
@@ -108,20 +111,22 @@ func generate_common() (string, string) {
 }
 
 func check_boot(cmd *cobra.Command, args []string) error {
-	errs := []string{}
-	if "" == image {
-		errs = append(errs, "\"--image\" requires")
-	}
-	if "" == flavor {
-		errs = append(errs, "\"--flavor\" requires")
-	}
-	if "" == network {
-		errs = append(errs, "\"--network\" requires")
-	}
+	/*
+		errs := []string{}
+			if "" == image {
+				errs = append(errs, "\"--image\" requires")
+			}
+			if "" == flavor {
+				errs = append(errs, "\"--flavor\" requires")
+			}
+			if "" == network {
+				errs = append(errs, "\"--network\" requires")
+			}
 
-	if len(errs) > 0 {
-		return errors.New(strings.Join(errs, "\n"))
-	}
+			if len(errs) > 0 {
+				return errors.New(strings.Join(errs, "\n"))
+			}
+	*/
 
 	if 0 < size {
 		fmt.Printf(

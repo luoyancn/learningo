@@ -47,6 +47,7 @@ func init() {
 		RootCmd.PersistentFlags().StringVarP(
 			&configfile, "config-file", "c", "",
 			"The full path of config file")
+		// RootCmd.MarkPersistentFlagRequired("config-file")
 		router = fasthttprouter.New()
 		router.GET("/", root)
 		resources.InitRouter(router)
