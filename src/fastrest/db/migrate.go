@@ -2,7 +2,6 @@ package db
 
 import (
 	"fastrest/logging"
-	"fmt"
 	"os"
 	"sync"
 	"time"
@@ -21,7 +20,7 @@ func InitDbConnection() {
 		orm_db, err = gorm.Open(
 			"mysql", viper.GetString("database.connection"))
 		if nil != err {
-			fmt.Printf("Cannot init database connection:%v\n", err)
+			logging.TRACE.Fatalf("Cannot init database connection:%v\n", err)
 			orm_db = nil
 			os.Exit(-2)
 		}
