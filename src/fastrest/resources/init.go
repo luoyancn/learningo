@@ -2,6 +2,7 @@ package resources
 
 import (
 	"fastrest/logging"
+	"fastrest/middleware"
 	"fmt"
 	"strings"
 	"sync"
@@ -52,19 +53,23 @@ func valite_req_body(ctx *fasthttp.RequestCtx, str_body string,
 }
 
 func InitRouter(router *fasthttprouter.Router) {
-	router.GET("/users", user_lists)
-	router.GET("/users/:userid", user_get)
-	router.POST("/users", user_create)
-	router.POST("/users/:userid", user_update)
-	router.PUT("/users/:userid", user_update)
-	router.DELETE("/users/:userid", user_delete)
+	router.GET("/users", middleware.AuthMidddle(user_lists))
+	router.GET("/users/:userid", middleware.AuthMidddle(user_get))
+	router.POST("/users", middleware.BuildMiddleWareChain(
+		user_create, middleware.JsonMiddleware, middleware.AuthMidddle))
+	router.POST("/users/:userid", middleware.AuthMidddle(user_update))
+	router.PUT("/users/:userid", middleware.AuthMidddle(user_update))
+	router.DELETE("/users/:userid", middleware.AuthMidddle(user_delete))
 
-	router.GET("/roles", role_lists)
-	router.GET("/roles/:roleid", role_get)
-	router.POST("/roles", role_create)
-	router.DELETE("/roles/:roleid", role_delete)
+	router.GET("/roles", middleware.AuthMidddle(role_lists))
+	router.GET("/roles/:roleid", middleware.AuthMidddle(role_get))
+	router.POST("/roles", middleware.AuthMidddle(role_create))
+	router.DELETE("/roles/:roleid", middleware.AuthMidddle(role_delete))
 
-	router.GET("/users/:userid/permisions", permision_list)
-	router.PUT("/permisions/:userid/roles/:roleid", permision_create)
-	router.DELETE("/permisions/:userid/roles/:roleid", permision_delete)
+	router.GET("/users/:userid/permisions",
+		middleware.AuthMidddle(permision_list))
+	router.PUT("/permisions/:userid/roles/:roleid",
+		middleware.AuthMidddle(permision_create))
+	router.DELETE("/permisions/:userid/roles/:roleid",
+		middleware.AuthMidddle(permision_delete))
 }
