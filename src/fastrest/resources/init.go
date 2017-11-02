@@ -63,7 +63,8 @@ func InitRouter(router *fasthttprouter.Router) {
 
 	router.GET("/roles", middleware.AuthMidddle(role_lists))
 	router.GET("/roles/:roleid", middleware.AuthMidddle(role_get))
-	router.POST("/roles", middleware.AuthMidddle(role_create))
+	router.POST("/roles", middleware.BuildMiddleWareChain(
+		role_create, middleware.AuthMidddle, middleware.JsonMiddleware))
 	router.DELETE("/roles/:roleid", middleware.AuthMidddle(role_delete))
 
 	router.GET("/users/:userid/permisions",
