@@ -24,7 +24,7 @@ func initLog(traceHandle io.Writer, infoHandle io.Writer,
 	WARNING = log.New(warningHandle, "WARNING: ",
 		log.Ldate|log.Ltime|log.Lshortfile)
 	ERROR = log.New(errorHandle, "ERROR: ", log.Ldate|log.Ltime|log.Lshortfile)
-	DEBUG = log.New(errorHandle, "DEBUG: ", log.Ldate|log.Ltime|log.Lshortfile)
+	DEBUG = log.New(debugHandler, "DEBUG: ", log.Ldate|log.Ltime|log.Lshortfile)
 }
 
 func GetLogger() {

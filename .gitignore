@@ -3,3 +3,5 @@ pkg/
 src/vendor/*
 !src/vendor/vendor.json
 .cache/
+*.log
+*.toml
