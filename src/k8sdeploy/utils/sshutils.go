@@ -107,30 +107,35 @@ func scp_source_to_dest(ssh_conn *ssh.Client, binarys ...string) bool {
 		defer src_binary.Close()
 
 		_, dest_binary_name := filepath.Split(binary)
-		dest_binary, err := sftp_client.Create(
-			path.Join(dest_binary_path, dest_binary_name))
-		if err != nil {
-			logging.ERROR.Printf(
-				"Fail to create remote file %s in dest path %s :%v\n",
-				dest_binary_name, dest_binary_path, err)
-			//				scp_res <- false
-			//				return
-			return false
-		}
-		defer dest_binary.Close()
-
-		buf := make([]byte, 1024)
-		for {
-			n, _ := src_binary.Read(buf)
-			if n == 0 {
-				break
+		dest_binary_full_path := path.Join(dest_binary_path, dest_binary_name)
+		_, err = sftp_client.Stat(dest_binary_full_path)
+		if nil == err {
+			logging.WARNING.Printf("The target binary file exsit\n")
+		} else {
+			dest_binary, err := sftp_client.Create(dest_binary_full_path)
+			if err != nil {
+				logging.ERROR.Printf(
+					"Fail to create remote file %s in dest path %s :%v\n",
+					dest_binary_name, dest_binary_path, err)
+				//				scp_res <- false
+				//				return
+				return false
 			}
-			dest_binary.Write(buf[0:n])
+			defer dest_binary.Close()
+
+			buf := make([]byte, 1024)
+			for {
+				n, _ := src_binary.Read(buf)
+				if n == 0 {
+					break
+				}
+				dest_binary.Write(buf[0:n])
+			}
+			//			scp_res <- true
 		}
-		//			scp_res <- true
-		sftp_client.Chmod(
-			path.Join(dest_binary_path, dest_binary_name), 0755)
-		logging.INFO.Printf("Success scp file %s to remote\n", binary)
+		sftp_client.Chmod(dest_binary_full_path, 0755)
+		logging.INFO.Printf(
+			"Success scp file %s to remote\n", dest_binary_name)
 		//		}(binary)
 	}
 

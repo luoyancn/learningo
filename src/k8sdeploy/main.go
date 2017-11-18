@@ -74,6 +74,12 @@ func preparenv(cmd *cobra.Command, args []string) {
 		logging.TRACE.Printf("%s\n", msg)
 		os.Exit(-1)
 	}
+	if !viper.IsSet("cfs.templates") {
+		msg := ` Please tell me where were your templates for generate ca files
+in [cfs] section with templates\n`
+		logging.TRACE.Printf("%s\n", msg)
+		os.Exit(-1)
+	}
 	k8snodes = viper.GetStringSlice("k8s.nodes")
 	if !utils.SSHCheck(k8snodes...) {
 		logging.TRACE.Printf(
@@ -86,6 +92,12 @@ func deployk8s(cmd *cobra.Command, args []string) {
 	if !deploy.PrepareK8SBinary(k8snodes...) {
 		logging.TRACE.Printf(
 			"Failed to prepare k8s binary files on all k8snodes\n")
+		os.Exit(-1)
+	}
+
+	if err := deploy.CreateCA(); nil != err {
+		logging.TRACE.Printf(
+			"Failed to create CA files for k8snodes\n")
 		os.Exit(-1)
 	}
 }
