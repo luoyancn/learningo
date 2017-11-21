@@ -54,35 +54,35 @@ func read_config() {
 func preparenv(cmd *cobra.Command, args []string) {
 	read_config()
 	if 0 != os.Geteuid() {
-		logging.TRACE.Printf("Please execute this file with root permision\n")
+		logging.Trace("Please execute this file with root permision\n")
 		os.Exit(-1)
 	}
 	if !viper.IsSet("k8s.nodes") {
 		msg := "Please ensure k8snodes confired in config files"
-		logging.TRACE.Printf("%s\n", msg)
+		logging.Trace(msg)
 		os.Exit(-1)
 	}
 	if !viper.IsSet("k8s.binary_path") {
 		msg := ` Please tell me where were your k8s binarys in
 [k8s] section with binary_path\n`
-		logging.TRACE.Printf("%s\n", msg)
+		logging.Trace(msg)
 		os.Exit(-1)
 	}
 	if !viper.IsSet("cfs.binary_path") {
 		msg := ` Please tell me where were your cfs binarys in
 [cfs] section with binary_path\n`
-		logging.TRACE.Printf("%s\n", msg)
+		logging.Trace("%s\n", msg)
 		os.Exit(-1)
 	}
 	if !viper.IsSet("cfs.templates") {
 		msg := ` Please tell me where were your templates for generate ca files
 in [cfs] section with templates\n`
-		logging.TRACE.Printf("%s\n", msg)
+		logging.Trace(msg)
 		os.Exit(-1)
 	}
 	k8snodes = viper.GetStringSlice("k8s.nodes")
 	if !utils.SSHCheck(k8snodes...) {
-		logging.TRACE.Printf(
+		logging.Trace(
 			"Please ensure noauth-ssh configurated on all k8snodes\n")
 		os.Exit(-1)
 	}
@@ -90,13 +90,13 @@ in [cfs] section with templates\n`
 
 func deployk8s(cmd *cobra.Command, args []string) {
 	if !deploy.PrepareK8SBinary(k8snodes...) {
-		logging.TRACE.Printf(
+		logging.Trace(
 			"Failed to prepare k8s binary files on all k8snodes\n")
 		os.Exit(-1)
 	}
 
 	if err := deploy.CreateCA(); nil != err {
-		logging.TRACE.Printf(
+		logging.Trace(
 			"Failed to create CA files for k8snodes\n")
 		os.Exit(-1)
 	}

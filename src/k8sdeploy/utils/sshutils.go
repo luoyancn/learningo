@@ -18,13 +18,13 @@ import (
 func parsePublicKeyFile(file string) ssh.AuthMethod {
 	buffer, err := ioutil.ReadFile(file)
 	if err != nil {
-		logging.ERROR.Printf("Cannot found the id_rsa files:%v\n", err)
+		logging.Error("Cannot found the id_rsa files:%v\n", err)
 		return nil
 	}
 
 	key, err := ssh.ParsePrivateKey(buffer)
 	if err != nil {
-		logging.ERROR.Printf("Cannot parse the private key file:%v\n", err)
+		logging.Error("Cannot parse the private key file:%v\n", err)
 		return nil
 	}
 	return ssh.PublicKeys(key)
@@ -66,7 +66,7 @@ func get_binary_files(path string) []string {
 			return nil
 		})
 	if err != nil {
-		logging.ERROR.Printf("%v\n", err)
+		logging.Error("%v\n", err)
 	}
 	return files
 }
@@ -74,18 +74,18 @@ func get_binary_files(path string) []string {
 func scp_source_to_dest(ssh_conn *ssh.Client, binarys ...string) bool {
 	sftp_client, err := sftp.NewClient(ssh_conn)
 	if nil != err {
-		logging.ERROR.Printf("Cannot create scp tunnel:%v\n", err)
+		logging.Error("Cannot create scp tunnel:%v\n", err)
 		return false
 	}
 	defer sftp_client.Close()
 	dest_binary_path := viper.GetString("default.target_path")
 	_, err = sftp_client.Stat(dest_binary_path)
 	if nil != err {
-		logging.WARNING.Printf(
+		logging.Warning(
 			"The target binary path %s not exsit:%v, Try to create it ...\n",
 			dest_binary_path, err)
 		if err = sftp_client.Mkdir(dest_binary_path); nil != err {
-			logging.TRACE.Printf(
+			logging.Trace(
 				"Cannot create the path :%v\n", err)
 			return false
 		}
@@ -95,10 +95,10 @@ func scp_source_to_dest(ssh_conn *ssh.Client, binarys ...string) bool {
 	//	runtime.GOMAXPROCS(len(binarys))
 	for _, binary := range binarys {
 		//		go func(binary string) {
-		logging.INFO.Printf("Scp file %s to remote ...\n", binary)
+		logging.Info("Scp file %s to remote ...\n", binary)
 		src_binary, err := os.Open(binary)
 		if nil != err {
-			logging.ERROR.Printf(
+			logging.Error(
 				"Cannot read binary file %s:%v\n", binary, err)
 			//				scp_res <- false
 			//				return
@@ -110,11 +110,11 @@ func scp_source_to_dest(ssh_conn *ssh.Client, binarys ...string) bool {
 		dest_binary_full_path := path.Join(dest_binary_path, dest_binary_name)
 		_, err = sftp_client.Stat(dest_binary_full_path)
 		if nil == err {
-			logging.WARNING.Printf("The target binary file exsit\n")
+			logging.Warning("The target binary file exsit\n")
 		} else {
 			dest_binary, err := sftp_client.Create(dest_binary_full_path)
 			if err != nil {
-				logging.ERROR.Printf(
+				logging.Error(
 					"Fail to create remote file %s in dest path %s :%v\n",
 					dest_binary_name, dest_binary_path, err)
 				//				scp_res <- false
@@ -134,7 +134,7 @@ func scp_source_to_dest(ssh_conn *ssh.Client, binarys ...string) bool {
 			//			scp_res <- true
 		}
 		sftp_client.Chmod(dest_binary_full_path, 0755)
-		logging.INFO.Printf(
+		logging.Info(
 			"Success scp file %s to remote\n", dest_binary_name)
 		//		}(binary)
 	}
@@ -150,24 +150,24 @@ func scp_source_to_dest(ssh_conn *ssh.Client, binarys ...string) bool {
 }
 
 func SSHCheck(k8snodes ...string) bool {
-	logging.INFO.Printf("Waiting for ssh check for nodes :%v\n", k8snodes)
+	logging.Info("Waiting for ssh check for nodes :%v\n", k8snodes)
 	ssh_key := generate_ssh_auth_config()
 
 	check := make(chan bool, len(k8snodes))
 	runtime.GOMAXPROCS(len(k8snodes))
 	for _, node := range k8snodes {
 		go func(node string) {
-			logging.INFO.Printf("Connecting to the host %s ...\n", node)
+			logging.Info("Connecting to the host %s ...\n", node)
 			conn, err := get_ssh_connection(node, ssh_key)
 			if nil != err {
-				logging.ERROR.Printf(
+				logging.Error(
 					"Cannot connect to the host %s: %v\n", node, err)
 				check <- false
 				return
 			}
 			check <- true
 			defer conn.Close()
-			logging.INFO.Printf("Success connect to the host %s\n", node)
+			logging.Info("Success connect to the host %s\n", node)
 		}(node)
 	}
 
@@ -184,12 +184,12 @@ func SCPBinary(binary_type string, k8snodes ...string) bool {
 		strings.Join([]string{binary_type, "binary_path"}, "."))
 	files := get_binary_files(binary_files_path)
 	if 0 == len(files) {
-		logging.ERROR.Printf(
+		logging.Error(
 			"Please ensure the %s binary files in your path %s\n",
 			binary_type, binary_files_path)
 		return false
 	}
-	logging.DEBUG.Printf("The %s binary files were follows: %v\n",
+	logging.Debug("The %s binary files were follows: %v\n",
 		binary_type, files)
 
 	ssh_res := make(chan bool, len(k8snodes))
@@ -197,12 +197,12 @@ func SCPBinary(binary_type string, k8snodes ...string) bool {
 
 	for _, node := range k8snodes {
 		go func(node string) {
-			logging.INFO.Printf("Scp %s binarys to host %s ...\n",
+			logging.Info("Scp %s binarys to host %s ...\n",
 				binary_type, node)
 			ssh_conn, err := get_ssh_connection(
 				node, generate_ssh_auth_config())
 			if nil != err {
-				logging.ERROR.Printf(
+				logging.Error(
 					"Cannot scp the %s binarys to %s: %v\n",
 					binary_type, node, err)
 				ssh_res <- false
@@ -210,12 +210,12 @@ func SCPBinary(binary_type string, k8snodes ...string) bool {
 			}
 			defer ssh_conn.Close()
 			if !scp_source_to_dest(ssh_conn, files...) {
-				logging.ERROR.Printf(
+				logging.Error(
 					"Fail to scp the %s binarys to %s\n", binary_type, node)
 				ssh_res <- false
 				return
 			}
-			logging.INFO.Printf(
+			logging.Info(
 				"Scp %s binarys to host %s success \n", binary_type, node)
 			ssh_res <- true
 		}(node)

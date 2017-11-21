@@ -37,8 +37,32 @@
 			"revisionTime": "2017-11-10T19:24:13Z"
 		},
 		{
+			"checksumSHA1": "QjOvP4bAJHcs7ZP5ZfrV5IUmHLk=",
+			"path": "github.com/cloudflare/cfssl/certdb/dbconf",
+			"revision": "9ada30affe7af7e87eb1c3056854b227a9a90998",
+			"revisionTime": "2017-11-10T19:24:13Z"
+		},
+		{
+			"checksumSHA1": "qc8uHUVmZJagqJKXztkc2qHxUKM=",
+			"path": "github.com/cloudflare/cfssl/certdb/sql",
+			"revision": "9ada30affe7af7e87eb1c3056854b227a9a90998",
+			"revisionTime": "2017-11-10T19:24:13Z"
+		},
+		{
 			"checksumSHA1": "a5tQKaWusOb/kpWeqi9N7q13cPI=",
 			"path": "github.com/cloudflare/cfssl/cli",
+			"revision": "9ada30affe7af7e87eb1c3056854b227a9a90998",
+			"revisionTime": "2017-11-10T19:24:13Z"
+		},
+		{
+			"checksumSHA1": "ofAujg7q/AnJfvmQrhhhUOgFnec=",
+			"path": "github.com/cloudflare/cfssl/cli/genkey",
+			"revision": "9ada30affe7af7e87eb1c3056854b227a9a90998",
+			"revisionTime": "2017-11-10T19:24:13Z"
+		},
+		{
+			"checksumSHA1": "rathvkYrwSfTxBR2IqX1EW5jZ64=",
+			"path": "github.com/cloudflare/cfssl/cli/sign",
 			"revision": "9ada30affe7af7e87eb1c3056854b227a9a90998",
 			"revisionTime": "2017-11-10T19:24:13Z"
 		},
@@ -299,6 +323,24 @@
 			"path": "github.com/jinzhu/inflection",
 			"revision": "1c35d901db3da928c72a72d8458480cc9ade058f",
 			"revisionTime": "2017-01-02T12:52:26Z"
+		},
+		{
+			"checksumSHA1": "PnLxuIAASaeI73PQpQe+TYlvOgw=",
+			"path": "github.com/jmoiron/sqlx",
+			"revision": "3379e5993990b1f927fc8db926485e6f6becf2d2",
+			"revisionTime": "2017-10-20T20:55:21Z"
+		},
+		{
+			"checksumSHA1": "xXjxKqs3ECyWO5zjIVb2qgj9rcU=",
+			"path": "github.com/jmoiron/sqlx/reflectx",
+			"revision": "3379e5993990b1f927fc8db926485e6f6becf2d2",
+			"revisionTime": "2017-10-20T20:55:21Z"
+		},
+		{
+			"checksumSHA1": "ss+6kcmkUGRUhwrx3RmE+C6rBhY=",
+			"path": "github.com/kisielk/sqlstruct",
+			"revision": "648daed35d49dac24a4bff253b190a80da3ab6a5",
+			"revisionTime": "2015-09-23T20:50:31Z"
 		},
 		{
 			"checksumSHA1": "+IQN6csaE5uxhZJnulb6uwhVCr4=",

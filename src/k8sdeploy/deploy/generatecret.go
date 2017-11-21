@@ -5,5 +5,5 @@ import (
 )
 
 func CreateCA() error {
-	return utils.InitCA()
+	return utils.CreateCert()
 }

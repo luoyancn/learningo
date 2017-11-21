@@ -1,6 +1,7 @@
 package logging
 
 import (
+	"fmt"
 	"io"
 	"io/ioutil"
 	"log"
@@ -10,25 +11,45 @@ import (
 )
 
 var (
-	TRACE   *log.Logger
-	INFO    *log.Logger
-	WARNING *log.Logger
-	ERROR   *log.Logger
-	DEBUG   *log.Logger
+	trace   *log.Logger
+	info    *log.Logger
+	warning *log.Logger
+	eRROR   *log.Logger
+	debug   *log.Logger
 )
 
 func initLog(traceHandle io.Writer, infoHandle io.Writer,
 	warningHandle io.Writer, errorHandle io.Writer, debugHandler io.Writer) {
-	TRACE = log.New(traceHandle, "TRACE: ",
-		log.Ldate|log.Ltime|log.Lmicroseconds|log.Lshortfile)
-	INFO = log.New(infoHandle, "INFO: ",
-		log.Ldate|log.Ltime|log.Lmicroseconds|log.Lshortfile)
-	WARNING = log.New(warningHandle, "WARNING: ",
-		log.Ldate|log.Ltime|log.Lmicroseconds|log.Lshortfile)
-	ERROR = log.New(errorHandle, "ERROR: ",
-		log.Ldate|log.Ltime|log.Lmicroseconds|log.Lshortfile)
-	DEBUG = log.New(debugHandler, "DEBUG: ",
-		log.Ldate|log.Ltime|log.Lmicroseconds|log.Lshortfile)
+	trace = log.New(
+		traceHandle, "", log.Ldate|log.Ltime|log.Lmicroseconds)
+	info = log.New(
+		infoHandle, "", log.Ldate|log.Ltime|log.Lmicroseconds)
+	warning = log.New(
+		warningHandle, "", log.Ldate|log.Ltime|log.Lmicroseconds)
+	eRROR = log.New(
+		errorHandle, "", log.Ldate|log.Ltime|log.Lmicroseconds)
+	debug = log.New(
+		debugHandler, "", log.Ldate|log.Ltime|log.Lmicroseconds)
+}
+
+func Trace(format string, msg ...interface{}) {
+	trace.Printf("[TRACE] %s", fmt.Sprintf(format, msg...))
+}
+
+func Info(format string, msg ...interface{}) {
+	info.Printf("[INFO] %s", fmt.Sprintf(format, msg...))
+}
+
+func Warning(format string, msg ...interface{}) {
+	warning.Printf("[WARNING] %s", fmt.Sprintf(format, msg...))
+}
+
+func Error(format string, msg ...interface{}) {
+	eRROR.Printf("[ERROR] %s", fmt.Sprintf(format, msg...))
+}
+
+func Debug(format string, msg ...interface{}) {
+	debug.Printf("[DEBUG] %s", fmt.Sprintf(format, msg...))
 }
 
 func GetLogger() {
@@ -39,6 +60,7 @@ func GetLogger() {
 		log.Fatalf("%v\n", err)
 	}
 	multi_writer := io.MultiWriter(os.Stdout, logfile)
+	log.SetFlags(log.Ldate | log.Ltime | log.Lmicroseconds)
 	log.SetOutput(multi_writer)
 	if viper.GetBool("default.debug") {
 		initLog(multi_writer, multi_writer, multi_writer,
