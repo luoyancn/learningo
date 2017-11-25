@@ -63,20 +63,20 @@ func preparenv(cmd *cobra.Command, args []string) {
 		os.Exit(-1)
 	}
 	if !viper.IsSet("k8s.binary_path") {
-		msg := ` Please tell me where were your k8s binarys in
-[k8s] section with binary_path\n`
+		msg := "Please tell me where were your k8s binarys" +
+			" in [k8s] section with binary_path\n"
 		logging.LOG.Critical(msg)
 		os.Exit(-1)
 	}
 	if !viper.IsSet("cfs.binary_path") {
-		msg := ` Please tell me where were your cfs binarys in
-[cfs] section with binary_path\n`
+		msg := "Please tell me where were your cfs binarys in" +
+			" [cfs] section with binary_path\n"
 		logging.LOG.Critical("%s\n", msg)
 		os.Exit(-1)
 	}
 	if !viper.IsSet("cfs.templates") {
-		msg := ` Please tell me where were your templates for generate ca files
-in [cfs] section with templates\n`
+		msg := "Please tell me where were your templates for generate ca" +
+			" files in [cfs] section with templates\n"
 		logging.LOG.Critical(msg)
 		os.Exit(-1)
 	}

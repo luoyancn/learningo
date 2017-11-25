@@ -9,7 +9,7 @@ import (
 	"github.com/spf13/viper"
 )
 
-var LOG = gologging.MustGetLogger("k8sdeploy")
+var LOG *gologging.Logger
 
 var format_std = gologging.MustStringFormatter(
 	"%{color}%{time:2006-01-02 15:04:05.999999}" +
@@ -26,6 +26,7 @@ var once sync.Once
 
 func GetLogger() {
 	once.Do(func() {
+		LOG = gologging.MustGetLogger("k8sdeploy")
 		logfile, err := os.OpenFile(
 			viper.GetString("default.log_file"),
 			os.O_RDWR|os.O_CREATE|os.O_APPEND, 0666)
