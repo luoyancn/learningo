@@ -26,7 +26,7 @@ type outputFile struct {
 func writeFile(filespec, contents string, perms os.FileMode) error {
 	err := ioutil.WriteFile(filespec, []byte(contents), perms)
 	if nil != err {
-		logging.Error("Cannot Write to the CA files:%v\n", err)
+		logging.LOG.Errorf("Cannot Write to the CA files:%v\n", err)
 		return err
 	}
 	return nil
@@ -117,7 +117,7 @@ func CreateCert() error {
 	template_path := viper.GetString("cfs.templates")
 	err := generate_ca_files("ca", template_path, nil)
 	if nil != err {
-		logging.Error("Fail to generate the CA files:%v\n", err)
+		logging.LOG.Errorf("Fail to generate the CA files:%v\n", err)
 		return err
 	}
 	var config cli.Config
@@ -132,20 +132,20 @@ func CreateCert() error {
 
 	err = generate_ca_files("admin", template_path, &config)
 	if nil != err {
-		logging.Error("Fail to generate the admin ca files:%v\n", err)
+		logging.LOG.Errorf("Fail to generate the admin ca files:%v\n", err)
 		return err
 	}
 
 	err = generate_ca_files("kube-proxy", template_path, &config)
 	if nil != err {
-		logging.Error(
+		logging.LOG.Errorf(
 			"Fail to generate the kube-proxy ca files:%v\n", err)
 		return err
 	}
 
 	err = generate_ca_files("kubernetes", template_path, &config)
 	if nil != err {
-		logging.Error(
+		logging.LOG.Errorf(
 			"Fail to generate the kubernetes ca files:%v\n", err)
 		return err
 	}

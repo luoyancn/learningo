@@ -385,6 +385,12 @@
 			"revisionTime": "2017-10-17T17:18:08Z"
 		},
 		{
+			"checksumSHA1": "BoXdUBWB8UnSlFlbnuTQaPqfCGk=",
+			"path": "github.com/op/go-logging",
+			"revision": "970db520ece77730c7e4724c61121037378659d9",
+			"revisionTime": "2016-03-15T20:05:05Z"
+		},
+		{
 			"checksumSHA1": "pQwCl21+SANhotaqy5iEdqOnQiY=",
 			"path": "github.com/pelletier/go-toml",
 			"revision": "4e9e0ee19b60b13eb79915933f44d8ed5f268bdd",
@@ -583,5 +589,5 @@
 			"revisionTime": "2017-08-12T16:00:11Z"
 		}
 	],
-	"rootPath": "/opt/github.com/learningo/src"
+	"rootPath": "/mnt/hgfs/cprojects/golang/linuxgo/src"
 }
