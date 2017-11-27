@@ -1,0 +1,13 @@
+[default]
+target_path = "/usr/bin"
+debug = false
+
+[k8s]
+nodes = ["192.168.142.18","192.168.142.19","192.168.142.21"]
+binary_path = "/home/zhangjl/kubernetes/kubernetes"
+config_path = "/etc/kubernetes"
+ssl_config_path = "/etc/kubernetes/ssl"
+
+[cfs]
+binary_path = "/home/zhangjl/kubernetes/cfssl"
+templates = "/opt/github.com/learningo/templates"

@@ -1,7 +1,6 @@
 package logging
 
 import (
-	"log"
 	"os"
 	"sync"
 
@@ -31,7 +30,7 @@ func GetLogger() {
 			viper.GetString("default.log_file"),
 			os.O_RDWR|os.O_CREATE|os.O_APPEND, 0666)
 		if err != nil {
-			log.Fatalf("%v\n", err)
+			LOG.Panicf("Cannot create the log file :%v\n", err)
 		}
 		file_backend := gologging.NewLogBackend(logfile, "", 0)
 		std_backend := gologging.NewLogBackend(os.Stdout, "", 0)
@@ -42,7 +41,7 @@ func GetLogger() {
 			std_backend, format_std)
 
 		gologging.SetBackend(file_back_formater, std_back_formater)
-		if !viper.GetBool("default.debug") {
+		if viper.GetBool("default.debug") {
 			gologging.SetLevel(gologging.DEBUG, "")
 		} else {
 			gologging.SetLevel(gologging.INFO, "")
