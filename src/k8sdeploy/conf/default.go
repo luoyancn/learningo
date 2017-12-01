@@ -19,13 +19,14 @@ func init() {
 func set_default_section() {
 	viper.SetDefault("default.debug", false)
 	viper.SetDefault("default.log_file", "k8sdeploy.log")
-	viper.SetDefault("default.target_path", "/usr/bin")
 }
 
 func set_k8s_section() {
+	viper.SetDefault("k8s.target_path", "/usr/bin")
 	viper.SetDefault("k8s.config_path", "/etc/kubernetes")
 	viper.SetDefault("k8s.ssl_config_path", "/etc/kubernetes/ssl")
 }
 
 func set_cfs_section() {
+	viper.SetDefault("cfs.output", "ca")
 }

@@ -33,7 +33,7 @@ func writeFile(filespec, contents string, perms os.FileMode) error {
 }
 
 func generate_ca_files(ca_name string, template_path string,
-	config *cli.Config) error {
+	output_path string, config *cli.Config) error {
 	csrJSONFileBytes, err := cli.ReadStdin(
 		path.Join(template_path, ca_name+"-csr.json"))
 	if err != nil {
@@ -83,7 +83,7 @@ func generate_ca_files(ca_name string, template_path string,
 	var outs []outputFile
 	if cert != nil {
 		outs = append(outs, outputFile{
-			Filename: path.Join(template_path, ca_name+".pem"),
+			Filename: path.Join(output_path, ca_name+".pem"),
 			Contents: string(cert),
 			Perms:    0664,
 		})
@@ -91,7 +91,7 @@ func generate_ca_files(ca_name string, template_path string,
 
 	if key != nil {
 		outs = append(outs, outputFile{
-			Filename: path.Join(template_path, ca_name+"-key.pem"),
+			Filename: path.Join(output_path, ca_name+"-key.pem"),
 			Contents: string(key),
 			Perms:    0600,
 		})
@@ -99,7 +99,7 @@ func generate_ca_files(ca_name string, template_path string,
 
 	if csrPEM != nil {
 		outs = append(outs, outputFile{
-			Filename: path.Join(template_path, ca_name+".csr"),
+			Filename: path.Join(output_path, ca_name+".csr"),
 			Contents: string(csrPEM),
 			Perms:    0600,
 		})
@@ -115,7 +115,8 @@ func generate_ca_files(ca_name string, template_path string,
 
 func CreateCert() error {
 	template_path := viper.GetString("cfs.templates")
-	err := generate_ca_files("ca", template_path, nil)
+	output_path := viper.GetString("cfs.output")
+	err := generate_ca_files("ca", template_path, output_path, nil)
 	if nil != err {
 		logging.LOG.Errorf("Fail to generate the CA files:%v\n", err)
 		return err
@@ -125,25 +126,25 @@ func CreateCert() error {
 	config.Hostname = ""
 	config.Label = ""
 	config.Port = 8888
-	config.CAFile = path.Join(template_path, "ca.pem")
-	config.CAKeyFile = path.Join(template_path, "ca-key.pem")
+	config.CAFile = path.Join(output_path, "ca.pem")
+	config.CAKeyFile = path.Join(output_path, "ca-key.pem")
 	config.ConfigFile = path.Join(template_path, "ca-config.json")
 	config.Profile = "kubernetes"
 
-	err = generate_ca_files("admin", template_path, &config)
+	err = generate_ca_files("admin", template_path, output_path, &config)
 	if nil != err {
 		logging.LOG.Errorf("Fail to generate the admin ca files:%v\n", err)
 		return err
 	}
 
-	err = generate_ca_files("kube-proxy", template_path, &config)
+	err = generate_ca_files("kube-proxy", template_path, output_path, &config)
 	if nil != err {
 		logging.LOG.Errorf(
 			"Fail to generate the kube-proxy ca files:%v\n", err)
 		return err
 	}
 
-	err = generate_ca_files("kubernetes", template_path, &config)
+	err = generate_ca_files("kubernetes", template_path, output_path, &config)
 	if nil != err {
 		logging.LOG.Errorf(
 			"Fail to generate the kubernetes ca files:%v\n", err)

@@ -10,10 +10,10 @@ var log = gologging.MustGetLogger("example")
 
 var format_stdio = gologging.MustStringFormatter(
 	"%{color}%{time:2006-01-02 15:04:05.999999} " +
-		"%{shortfile} %{shortfunc} [%{level:.4s}] %{color:reset} %{message}",
+		"%{shortfile} %{shortfunc} [%{level:.8s}] %{color:reset} %{message}",
 )
 var format_file = gologging.MustStringFormatter(
-	`%{time:15:04:05.000} %{shortfunc} [%{level:.4s}] %{message}`,
+	`%{time:15:04:05.000} %{shortfunc} [%{level:.8s}] %{message}`,
 )
 
 type Password string

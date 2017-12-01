@@ -59,30 +59,42 @@ func preparenv(cmd *cobra.Command, args []string) {
 	}
 	if !viper.IsSet("k8s.nodes") {
 		msg := "Please ensure k8snodes confired in config files"
-		logging.LOG.Critical(msg)
+		logging.LOG.Criticalf(msg)
 		os.Exit(-1)
 	}
 	if !viper.IsSet("k8s.binary_path") {
 		msg := "Please tell me where were your k8s binarys" +
 			" in [k8s] section with binary_path\n"
-		logging.LOG.Critical(msg)
-		os.Exit(-1)
-	}
-	if !viper.IsSet("cfs.binary_path") {
-		msg := "Please tell me where were your cfs binarys in" +
-			" [cfs] section with binary_path\n"
-		logging.LOG.Critical("%s\n", msg)
+		logging.LOG.Criticalf(msg)
 		os.Exit(-1)
 	}
 	if !viper.IsSet("cfs.templates") {
 		msg := "Please tell me where were your templates for generate ca" +
 			" files in [cfs] section with templates\n"
-		logging.LOG.Critical(msg)
+		logging.LOG.Criticalf(msg)
 		os.Exit(-1)
 	}
 	k8snodes = viper.GetStringSlice("k8s.nodes")
+
+	/*
+		hostname, err := os.Hostname()
+		if nil != err {
+			logging.LOG.Critical(
+				"Cannot get the hostname of this nodes:%v\n", err)
+			os.Exit(-1)
+		}
+			logging.LOG.Noticef("%s\n", hostname)
+			for _, host := range k8snodes {
+				if hostname == host {
+					break
+				}
+				logging.LOG.Noticef(
+					"Please execute this programs on one of k8snodes\n")
+				os.Exit(-1)
+			}
+	*/
 	if !utils.SSHCheck(k8snodes...) {
-		logging.LOG.Critical(
+		logging.LOG.Criticalf(
 			"Please ensure noauth-ssh configurated on all k8snodes\n")
 		os.Exit(-1)
 	}
@@ -90,16 +102,24 @@ func preparenv(cmd *cobra.Command, args []string) {
 
 func deployk8s(cmd *cobra.Command, args []string) {
 	if !deploy.PrepareK8SBinary(k8snodes...) {
-		logging.LOG.Critical(
+		logging.LOG.Criticalf(
 			"Failed to prepare k8s binary files on all k8snodes\n")
 		os.Exit(-1)
 	}
 
 	if err := deploy.CreateCA(); nil != err {
-		logging.LOG.Critical(
-			"Failed to create CA files for k8snodes\n")
+		logging.LOG.Criticalf(
+			"Failed to create CA files for k8snodes:%v\n", err)
 		os.Exit(-1)
 	}
+
+	if !deploy.PrepareCAKey(k8snodes...) {
+		logging.LOG.Critical(
+			"Failed to prepare ca-key files on all k8snodes\n")
+		os.Exit(-1)
+	}
+	/*
+	 */
 }
 
 func Execute() {

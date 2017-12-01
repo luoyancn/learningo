@@ -11,13 +11,13 @@ import (
 var LOG *gologging.Logger
 
 var format_std = gologging.MustStringFormatter(
-	"%{color}%{time:2006-01-02 15:04:05.999999}" +
+	"%{color}%{time:2006-01-02 15:04:05.999999999}" +
 		" [%{level:.8s}] %{shortfile} %{shortfunc}" +
 		" %{color:reset} %{message}",
 )
 
 var format_file = gologging.MustStringFormatter(
-	"%{time:2006-01-02 15:04:05.999999} [%{level:.8s}] " +
+	"%{time:2006-01-02 15:04:05.999999999} [%{level:.8s}] " +
 		" %{shortfile} %{shortfunc} %{message}",
 )
 

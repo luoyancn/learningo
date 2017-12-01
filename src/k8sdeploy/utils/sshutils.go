@@ -11,7 +11,6 @@ import (
 	"time"
 
 	"github.com/pkg/sftp"
-	"github.com/spf13/viper"
 	"golang.org/x/crypto/ssh"
 )
 
@@ -52,7 +51,7 @@ func get_ssh_connection(host string,
 	return conn, nil
 }
 
-func get_binary_files(path string) []string {
+func get_files(path string) []string {
 	files := []string{}
 	err := filepath.Walk(
 		path, func(path string, f os.FileInfo, err error) error {
@@ -71,22 +70,28 @@ func get_binary_files(path string) []string {
 	return files
 }
 
-func scp_source_to_dest(ssh_conn *ssh.Client, binarys ...string) bool {
+func scp_source_to_dest(ssh_conn *ssh.Client, file_type string,
+	dest_path string, binarys ...string) bool {
 	sftp_client, err := sftp.NewClient(ssh_conn)
 	if nil != err {
 		logging.LOG.Errorf("Cannot create scp tunnel:%v\n", err)
 		return false
 	}
 	defer sftp_client.Close()
-	dest_binary_path := viper.GetString("default.target_path")
-	_, err = sftp_client.Stat(dest_binary_path)
+	_, err = sftp_client.Stat(dest_path)
 	if nil != err {
 		logging.LOG.Warningf(
-			"The target binary path %s not exsit:%v, Try to create it ...\n",
-			dest_binary_path, err)
-		if err = sftp_client.Mkdir(dest_binary_path); nil != err {
-			logging.LOG.Criticalf(
-				"Cannot create the path :%v\n", err)
+			"The target path %s not exsit:%v, Try to create it ...\n",
+			dest_path, err)
+		ssh_session, err := ssh_conn.NewSession()
+		if nil != err {
+			logging.LOG.Errorf("Cannot create ssh tunnel:%v\n", err)
+			return false
+		}
+		cmd := "mkdir -p " + dest_path
+		if err = ssh_session.Run(cmd); nil != err {
+			logging.LOG.Errorf("Cannot create the dest path %s :%v\n",
+				dest_path, err)
 			return false
 		}
 	}
@@ -107,16 +112,16 @@ func scp_source_to_dest(ssh_conn *ssh.Client, binarys ...string) bool {
 		defer src_binary.Close()
 
 		_, dest_binary_name := filepath.Split(binary)
-		dest_binary_full_path := path.Join(dest_binary_path, dest_binary_name)
+		dest_binary_full_path := path.Join(dest_path, dest_binary_name)
 		_, err = sftp_client.Stat(dest_binary_full_path)
 		if nil == err {
-			logging.LOG.Warningf("The target binary file exsit\n")
+			logging.LOG.Warningf("The target file exsit\n")
 		} else {
 			dest_binary, err := sftp_client.Create(dest_binary_full_path)
 			if err != nil {
 				logging.LOG.Errorf(
 					"Fail to create remote file %s in dest path %s :%v\n",
-					dest_binary_name, dest_binary_path, err)
+					dest_binary_name, dest_path, err)
 				//				scp_res <- false
 				//				return
 				return false
@@ -133,7 +138,9 @@ func scp_source_to_dest(ssh_conn *ssh.Client, binarys ...string) bool {
 			}
 			//			scp_res <- true
 		}
-		sftp_client.Chmod(dest_binary_full_path, 0755)
+		if file_type == "binary" {
+			sftp_client.Chmod(dest_binary_full_path, 0755)
+		}
 		logging.LOG.Infof(
 			"Success scp file %s to remote\n", dest_binary_name)
 		//		}(binary)
@@ -179,44 +186,42 @@ func SSHCheck(k8snodes ...string) bool {
 	return true
 }
 
-func SCPBinary(binary_type string, k8snodes ...string) bool {
-	binary_files_path := viper.GetString(
-		strings.Join([]string{binary_type, "binary_path"}, "."))
-	files := get_binary_files(binary_files_path)
+func SCPFiles(source_path []string, dest_path string,
+	file_type string, k8snodes ...string) bool {
+	files := []string{}
+	for _, pat := range source_path {
+		files = append(files, get_files(pat)...)
+	}
 	if 0 == len(files) {
 		logging.LOG.Errorf(
-			"Please ensure the %s binary files in your path %s\n",
-			binary_type, binary_files_path)
+			"There is no files in your source path %s\n", source_path)
 		return false
 	}
-	logging.LOG.Debugf("The %s binary files were follows: %v\n",
-		binary_type, files)
+	logging.LOG.Debugf("The files were follows: %v\n", files)
 
 	ssh_res := make(chan bool, len(k8snodes))
 	runtime.GOMAXPROCS(len(k8snodes))
 
 	for _, node := range k8snodes {
 		go func(node string) {
-			logging.LOG.Infof("Scp %s binarys to host %s ...\n",
-				binary_type, node)
+			logging.LOG.Infof("Scp files to host %s ...\n", node)
 			ssh_conn, err := get_ssh_connection(
 				node, generate_ssh_auth_config())
 			if nil != err {
 				logging.LOG.Errorf(
-					"Cannot scp the %s binarys to %s: %v\n",
-					binary_type, node, err)
+					"Cannot scp the files to %s: %v\n", node, err)
 				ssh_res <- false
 				return
 			}
 			defer ssh_conn.Close()
-			if !scp_source_to_dest(ssh_conn, files...) {
+			if !scp_source_to_dest(ssh_conn, file_type, dest_path, files...) {
 				logging.LOG.Errorf(
-					"Fail to scp the %s binarys to %s\n", binary_type, node)
+					"Fail to scp the files to %s\n", node)
 				ssh_res <- false
 				return
 			}
 			logging.LOG.Infof(
-				"Scp %s binarys to host %s success \n", binary_type, node)
+				"Scp files to host %s success \n", node)
 			ssh_res <- true
 		}(node)
 	}
