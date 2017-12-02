@@ -25,6 +25,10 @@ func set_k8s_section() {
 	viper.SetDefault("k8s.target_path", "/usr/bin")
 	viper.SetDefault("k8s.config_path", "/etc/kubernetes")
 	viper.SetDefault("k8s.ssl_config_path", "/etc/kubernetes/ssl")
+	viper.SetDefault("k8s.overwrite_binary", false)
+	viper.SetDefault("k8s.overwrite_ssl", true)
+	viper.SetDefault("k8s.cluster_name", "kubernetes")
+	viper.SetDefault("k8s.tmp", "/tmp")
 }
 
 func set_cfs_section() {

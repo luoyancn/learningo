@@ -7,7 +7,13 @@ nodes = ["192.168.142.18","192.168.142.19","192.168.142.21"]
 binary_path = "/home/zhangjl/kubernetes/kubernetes"
 config_path = "/etc/kubernetes"
 ssl_config_path = "/etc/kubernetes/ssl"
+overwrite_binary = false
+overwrite_ssl = true
+
+cluster_name = "kubernetes"
+tmp = "/tmp"
+
 
 [cfs]
 templates = "/opt/github.com/learningo/templates"
-output="/opt/github.com/learningo/ca"
+output = "/opt/github.com/learningo/ca"

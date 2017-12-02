@@ -118,8 +118,18 @@ func deployk8s(cmd *cobra.Command, args []string) {
 			"Failed to prepare ca-key files on all k8snodes\n")
 		os.Exit(-1)
 	}
-	/*
-	 */
+
+	if !deploy.GenerateK8sCtx(k8snodes...) {
+		logging.LOG.Critical(
+			"Failed to generate the kubernetes context on all k8snodes\n")
+		os.Exit(-1)
+	}
+
+	if !deploy.GenerateK8sConfig(k8snodes...) {
+		logging.LOG.Critical(
+			"Failed to generate the kubernetes config file on all k8snodes\n")
+		os.Exit(-1)
+	}
 }
 
 func Execute() {

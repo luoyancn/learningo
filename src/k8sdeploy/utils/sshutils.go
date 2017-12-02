@@ -29,7 +29,7 @@ func parsePublicKeyFile(file string) ssh.AuthMethod {
 	return ssh.PublicKeys(key)
 }
 
-func generate_ssh_auth_config() *ssh.ClientConfig {
+func GenerateSshAuthConfig() *ssh.ClientConfig {
 	ssh_config_with_key := &ssh.ClientConfig{
 		User: "root",
 		Auth: []ssh.AuthMethod{
@@ -41,7 +41,7 @@ func generate_ssh_auth_config() *ssh.ClientConfig {
 	return ssh_config_with_key
 }
 
-func get_ssh_connection(host string,
+func GetSshConnection(host string,
 	ssh_key *ssh.ClientConfig) (*ssh.Client, error) {
 	conn, err := ssh.Dial(
 		"tcp", strings.Join([]string{host, "22"}, ":"), ssh_key)
@@ -71,7 +71,7 @@ func get_files(path string) []string {
 }
 
 func scp_source_to_dest(ssh_conn *ssh.Client, file_type string,
-	dest_path string, binarys ...string) bool {
+	dest_path string, overwrite bool, binarys ...string) bool {
 	sftp_client, err := sftp.NewClient(ssh_conn)
 	if nil != err {
 		logging.LOG.Errorf("Cannot create scp tunnel:%v\n", err)
@@ -114,8 +114,8 @@ func scp_source_to_dest(ssh_conn *ssh.Client, file_type string,
 		_, dest_binary_name := filepath.Split(binary)
 		dest_binary_full_path := path.Join(dest_path, dest_binary_name)
 		_, err = sftp_client.Stat(dest_binary_full_path)
-		if nil == err {
-			logging.LOG.Warningf("The target file exsit\n")
+		if nil == err && !overwrite {
+			logging.LOG.Warningf("The target file exsit, skip the creating\n")
 		} else {
 			dest_binary, err := sftp_client.Create(dest_binary_full_path)
 			if err != nil {
@@ -158,14 +158,14 @@ func scp_source_to_dest(ssh_conn *ssh.Client, file_type string,
 
 func SSHCheck(k8snodes ...string) bool {
 	logging.LOG.Infof("Waiting for ssh check for nodes :%v\n", k8snodes)
-	ssh_key := generate_ssh_auth_config()
+	ssh_key := GenerateSshAuthConfig()
 
 	check := make(chan bool, len(k8snodes))
 	runtime.GOMAXPROCS(len(k8snodes))
 	for _, node := range k8snodes {
 		go func(node string) {
 			logging.LOG.Infof("Connecting to the host %s ...\n", node)
-			conn, err := get_ssh_connection(node, ssh_key)
+			conn, err := GetSshConnection(node, ssh_key)
 			if nil != err {
 				logging.LOG.Errorf(
 					"Cannot connect to the host %s: %v\n", node, err)
@@ -187,7 +187,7 @@ func SSHCheck(k8snodes ...string) bool {
 }
 
 func SCPFiles(source_path []string, dest_path string,
-	file_type string, k8snodes ...string) bool {
+	file_type string, overwrite bool, k8snodes ...string) bool {
 	files := []string{}
 	for _, pat := range source_path {
 		files = append(files, get_files(pat)...)
@@ -205,8 +205,8 @@ func SCPFiles(source_path []string, dest_path string,
 	for _, node := range k8snodes {
 		go func(node string) {
 			logging.LOG.Infof("Scp files to host %s ...\n", node)
-			ssh_conn, err := get_ssh_connection(
-				node, generate_ssh_auth_config())
+			ssh_conn, err := GetSshConnection(
+				node, GenerateSshAuthConfig())
 			if nil != err {
 				logging.LOG.Errorf(
 					"Cannot scp the files to %s: %v\n", node, err)
@@ -214,7 +214,8 @@ func SCPFiles(source_path []string, dest_path string,
 				return
 			}
 			defer ssh_conn.Close()
-			if !scp_source_to_dest(ssh_conn, file_type, dest_path, files...) {
+			if !scp_source_to_dest(ssh_conn, file_type, dest_path,
+				overwrite, files...) {
 				logging.LOG.Errorf(
 					"Fail to scp the files to %s\n", node)
 				ssh_res <- false
