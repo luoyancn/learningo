@@ -4,8 +4,11 @@ import (
 	"io/ioutil"
 	"k8sdeploy/logging"
 	"k8sdeploy/utils"
+	"os"
 	"os/exec"
+	"runtime"
 	"strings"
+	"time"
 
 	"github.com/spf13/viper"
 )
@@ -138,6 +141,30 @@ func GenerateK8sConfig(k8snodes ...string) bool {
 		logging.LOG.Fatalf(
 			"Failed to switch kubeproxy cluster context:%v\n", err)
 		return false
+	}
+
+	runtime.GOMAXPROCS(2)
+	create_channel := make(chan struct{}, 2)
+
+	for _, f := range []string{kube_file, kube_proxy} {
+		go func(f string) {
+			ticker := time.NewTicker(time.Millisecond * 10)
+			defer ticker.Stop()
+			for _ = range ticker.C {
+				if _, err := os.Stat(f); nil != err {
+					logging.LOG.Noticef(
+						"Waiting the kubenetes file %s created end\n", f)
+				} else {
+					logging.LOG.Noticef("kubenetes file %s created end\n", f)
+					break
+				}
+			}
+			create_channel <- struct{}{}
+		}(f)
+	}
+
+	for i := 0; i < 2; i++ {
+		<-create_channel
 	}
 
 	return utils.SCPFiles(

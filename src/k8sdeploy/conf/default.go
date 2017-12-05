@@ -13,6 +13,7 @@ func init() {
 		set_default_section()
 		set_k8s_section()
 		set_cfs_section()
+		set_etcd_section()
 	})
 }
 
@@ -33,4 +34,10 @@ func set_k8s_section() {
 
 func set_cfs_section() {
 	viper.SetDefault("cfs.output", "ca")
+}
+
+func set_etcd_section() {
+	viper.SetDefault("etcd.workdir_prefix", "/var/lib/etcd/")
+	viper.SetDefault("etcd.protocal", "https")
+	viper.SetDefault("etcd.cluster_name", "k8s-ectd-cluster")
 }

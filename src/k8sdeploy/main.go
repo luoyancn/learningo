@@ -16,6 +16,7 @@ import (
 var once sync.Once
 var configfile string
 var k8snodes []string
+var k8snodeips []string
 
 var rootcmd = &cobra.Command{
 	Short: "Tools for deploy kubernetes clusters",
@@ -74,8 +75,13 @@ func preparenv(cmd *cobra.Command, args []string) {
 		logging.LOG.Criticalf(msg)
 		os.Exit(-1)
 	}
-	k8snodes = viper.GetStringSlice("k8s.nodes")
 
+	//k8snodes = viper.GetStringSlice("k8s.nodes")
+	k8snode_map_ip := viper.GetStringMapString("k8s.nodes")
+	for node, ip := range k8snode_map_ip {
+		k8snodes = append(k8snodes, node)
+		k8snodeips = append(k8snodeips, ip)
+	}
 	/*
 		hostname, err := os.Hostname()
 		if nil != err {
@@ -93,7 +99,7 @@ func preparenv(cmd *cobra.Command, args []string) {
 				os.Exit(-1)
 			}
 	*/
-	if !utils.SSHCheck(k8snodes...) {
+	if !utils.SSHCheck(k8snodeips...) {
 		logging.LOG.Criticalf(
 			"Please ensure noauth-ssh configurated on all k8snodes\n")
 		os.Exit(-1)
@@ -101,7 +107,7 @@ func preparenv(cmd *cobra.Command, args []string) {
 }
 
 func deployk8s(cmd *cobra.Command, args []string) {
-	if !deploy.PrepareK8SBinary(k8snodes...) {
+	if !deploy.PrepareK8SBinary(k8snodeips...) {
 		logging.LOG.Criticalf(
 			"Failed to prepare k8s binary files on all k8snodes\n")
 		os.Exit(-1)
@@ -113,19 +119,19 @@ func deployk8s(cmd *cobra.Command, args []string) {
 		os.Exit(-1)
 	}
 
-	if !deploy.PrepareCAKey(k8snodes...) {
+	if !deploy.PrepareCAKey(k8snodeips...) {
 		logging.LOG.Critical(
 			"Failed to prepare ca-key files on all k8snodes\n")
 		os.Exit(-1)
 	}
 
-	if !deploy.GenerateK8sCtx(k8snodes...) {
+	if !deploy.GenerateK8sCtx(k8snodeips...) {
 		logging.LOG.Critical(
 			"Failed to generate the kubernetes context on all k8snodes\n")
 		os.Exit(-1)
 	}
 
-	if !deploy.GenerateK8sConfig(k8snodes...) {
+	if !deploy.GenerateK8sConfig(k8snodeips...) {
 		logging.LOG.Critical(
 			"Failed to generate the kubernetes config file on all k8snodes\n")
 		os.Exit(-1)
