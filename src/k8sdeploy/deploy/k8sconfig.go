@@ -152,7 +152,7 @@ func GenerateK8sConfig(k8snodes ...string) bool {
 			defer ticker.Stop()
 			for _ = range ticker.C {
 				if _, err := os.Stat(f); nil != err {
-					logging.LOG.Noticef(
+					logging.LOG.Warningf(
 						"Waiting the kubenetes file %s created end\n", f)
 				} else {
 					logging.LOG.Noticef("kubenetes file %s created end\n", f)
