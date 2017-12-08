@@ -63,7 +63,8 @@ func GenerateK8sConfig(k8snodes ...string) bool {
 	kubeproxyconfig := "--kubeconfig=" + kube_proxy
 
 	set_cluster_cmd := exec.Command(kubectl_cmd, "config", "set-cluster",
-		cluster_name, "--embed-certs=true", "--server="+k8snodes[0],
+		cluster_name, "--embed-certs=true",
+		"--server="+viper.GetString("k8s.api_server"),
 		"--certificate-authority="+ca_pem, kubeconfig)
 	logging.LOG.Infof("Running the command :%v\n", set_cluster_cmd.Args)
 	if err := set_cluster_cmd.Start(); nil != err {

@@ -37,7 +37,12 @@ func set_cfs_section() {
 }
 
 func set_etcd_section() {
-	viper.SetDefault("etcd.workdir_prefix", "/var/lib/etcd/")
+	viper.SetDefault("etcd.template", "etcd.conf.template")
 	viper.SetDefault("etcd.protocal", "https")
-	viper.SetDefault("etcd.cluster_name", "k8s-ectd-cluster")
+	viper.SetDefault("etcd.ssl", "/etc/etcd/ssl")
+	viper.SetDefault("etcd.debug", true)
+	viper.SetDefault("etcd.client_cert_auth", true)
+	viper.SetDefault("etcd.peer_cert_auth", true)
+	viper.SetDefault("etcd.cluster_token", "k8s-etcd-cluster")
+	viper.SetDefault("etcd.cluster_name", "k8s-etcd-cluster")
 }

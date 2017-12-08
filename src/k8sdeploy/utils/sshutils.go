@@ -78,7 +78,8 @@ func scp_source_to_dest(ssh_conn *ssh.Client, file_type string,
 		return false
 	}
 	defer sftp_client.Close()
-	_, err = sftp_client.Stat(dest_path)
+	dest_path_info, err := sftp_client.Stat(dest_path)
+	build_path := true
 	if nil != err {
 		logging.LOG.Warningf(
 			"The target path %s not exsit:%v, Try to create it ...\n",
@@ -93,6 +94,10 @@ func scp_source_to_dest(ssh_conn *ssh.Client, file_type string,
 			logging.LOG.Errorf("Cannot create the dest path %s :%v\n",
 				dest_path, err)
 			return false
+		}
+	} else {
+		if !dest_path_info.IsDir() {
+			build_path = false
 		}
 	}
 
@@ -111,8 +116,14 @@ func scp_source_to_dest(ssh_conn *ssh.Client, file_type string,
 		}
 		defer src_binary.Close()
 
-		_, dest_binary_name := filepath.Split(binary)
-		dest_binary_full_path := path.Join(dest_path, dest_binary_name)
+		var dest_binary_full_path string
+		var dest_binary_name string
+		if build_path {
+			_, dest_binary_name = filepath.Split(binary)
+			dest_binary_full_path = path.Join(dest_path, dest_binary_name)
+		} else {
+			dest_binary_full_path = dest_path
+		}
 		_, err = sftp_client.Stat(dest_binary_full_path)
 		if nil == err && !overwrite {
 			logging.LOG.Warningf("The target file exsit, skip the creating\n")
@@ -120,8 +131,8 @@ func scp_source_to_dest(ssh_conn *ssh.Client, file_type string,
 			dest_binary, err := sftp_client.Create(dest_binary_full_path)
 			if err != nil {
 				logging.LOG.Errorf(
-					"Fail to create remote file %s in dest path %s :%v\n",
-					dest_binary_name, dest_path, err)
+					"Fail to create remote file %s :%v\n",
+					dest_binary_full_path, err)
 				//				scp_res <- false
 				//				return
 				return false

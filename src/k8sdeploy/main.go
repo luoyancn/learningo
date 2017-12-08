@@ -15,6 +15,7 @@ import (
 
 var once sync.Once
 var configfile string
+var k8snode_map_ip map[string]string
 var k8snodes []string
 var k8snodeips []string
 
@@ -23,19 +24,30 @@ var rootcmd = &cobra.Command{
 	Long:  ` The commands aims to deploy kubernetes clusters in easy way`,
 }
 
-var deployCmd = &cobra.Command{
-	Use:   "deploy",
-	Short: "deploy the kubernetes cluster env",
+var initCmd = &cobra.Command{
+	Use:   "init",
+	Short: "Initial the kubernetes cluster env",
 	Long: `
-Deploy the kubernetes cluster with golang tools.
+Inital the kubernetes cluster with golang tools.
 `,
 	PreRun: preparenv,
-	Run:    deployk8s,
+	Run:    initk8senv,
+}
+
+var etcdCmd = &cobra.Command{
+	Use:   "etcd",
+	Short: "Deploy the etcd cluster",
+	Long: `
+Deploy the etcd cluster with golang tools.
+`,
+	PreRun: preparenv,
+	Run:    initetcd,
 }
 
 func init() {
 	once.Do(func() {
-		rootcmd.AddCommand(deployCmd)
+		rootcmd.AddCommand(initCmd)
+		rootcmd.AddCommand(etcdCmd)
 		rootcmd.PersistentFlags().StringVarP(
 			&configfile, "config-file", "c", "",
 			"The full path of config file")
@@ -77,7 +89,7 @@ func preparenv(cmd *cobra.Command, args []string) {
 	}
 
 	//k8snodes = viper.GetStringSlice("k8s.nodes")
-	k8snode_map_ip := viper.GetStringMapString("k8s.nodes")
+	k8snode_map_ip = viper.GetStringMapString("k8s.nodes")
 	for node, ip := range k8snode_map_ip {
 		k8snodes = append(k8snodes, node)
 		k8snodeips = append(k8snodeips, ip)
@@ -106,7 +118,7 @@ func preparenv(cmd *cobra.Command, args []string) {
 	}
 }
 
-func deployk8s(cmd *cobra.Command, args []string) {
+func initk8senv(cmd *cobra.Command, args []string) {
 	if !deploy.PrepareK8SBinary(k8snodeips...) {
 		logging.LOG.Criticalf(
 			"Failed to prepare k8s binary files on all k8snodes\n")
@@ -134,6 +146,15 @@ func deployk8s(cmd *cobra.Command, args []string) {
 	if !deploy.GenerateK8sConfig(k8snodeips...) {
 		logging.LOG.Critical(
 			"Failed to generate the kubernetes config file on all k8snodes\n")
+		os.Exit(-1)
+	}
+
+}
+
+func initetcd(cmd *cobra.Command, args []string) {
+	if !deploy.DeployEtcd(k8snode_map_ip) {
+		logging.LOG.Critical(
+			"Failed to deploy or init etcd cluster on all k8snodes\n")
 		os.Exit(-1)
 	}
 }

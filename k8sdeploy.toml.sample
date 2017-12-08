@@ -3,7 +3,8 @@ debug = false
 
 [k8s]
 target_path = "/usr/bin"
-nodes = ["192.168.142.18","192.168.142.19","192.168.142.21"]
+#nodes = ["192.168.142.18","192.168.142.19","192.168.142.21"]
+nodes = {k8snode1="192.168.142.18", k8snode2="192.168.142.19",k8snode3="192.168.142.21"}
 binary_path = "/home/zhangjl/kubernetes/kubernetes"
 config_path = "/etc/kubernetes"
 ssl_config_path = "/etc/kubernetes/ssl"
@@ -17,3 +18,7 @@ tmp = "/tmp"
 [cfs]
 templates = "/opt/github.com/learningo/templates"
 output = "/opt/github.com/learningo/ca"
+
+[etcd]
+template= "/opt/github.com/learningo/templates/etcd.conf.template"
+nodes = {k8snode1="192.168.142.18", k8snode2="192.168.142.19",k8snode3="192.168.142.21"}
