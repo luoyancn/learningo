@@ -35,7 +35,7 @@ Inital the kubernetes cluster with golang tools.
 }
 
 var etcdCmd = &cobra.Command{
-	Use:   "etcd",
+	Use:   "deploy-etcd",
 	Short: "Deploy the etcd cluster",
 	Long: `
 Deploy the etcd cluster with golang tools.
@@ -44,10 +44,21 @@ Deploy the etcd cluster with golang tools.
 	Run:    initetcd,
 }
 
+var dockerCmd = &cobra.Command{
+	Use:   "deploy-docker",
+	Short: "Deploy the docker service",
+	Long: `
+Deploy the docker service with golang tools.
+`,
+	PreRun: preparenv,
+	Run:    initdocker,
+}
+
 func init() {
 	once.Do(func() {
 		rootcmd.AddCommand(initCmd)
 		rootcmd.AddCommand(etcdCmd)
+		rootcmd.AddCommand(dockerCmd)
 		rootcmd.PersistentFlags().StringVarP(
 			&configfile, "config-file", "c", "",
 			"The full path of config file")
@@ -155,6 +166,14 @@ func initetcd(cmd *cobra.Command, args []string) {
 	if !deploy.DeployEtcd(k8snode_map_ip) {
 		logging.LOG.Critical(
 			"Failed to deploy or init etcd cluster on all k8snodes\n")
+		os.Exit(-1)
+	}
+}
+
+func initdocker(cmd *cobra.Command, args []string) {
+	if !deploy.DeployDocker(k8snodeips...) {
+		logging.LOG.Critical(
+			"Failed to generate the docker service config file on all k8snodes\n")
 		os.Exit(-1)
 	}
 }

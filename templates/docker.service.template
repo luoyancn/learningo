@@ -18,8 +18,12 @@ ExecStart=/usr/bin/dockerd \
             --storage-driver=overlay2 \
             --selinux-enabled=false \
             --registry-mirror={{.docker_hub_mirror}} \
+{{if not .harbor_registry}}
+            --insecure-registry={{.docker_gcr_io_mirror}}
+{{else}}
             --insecure-registry={{.docker_gcr_io_mirror}} \
             --insecure-registry={{.harbor_registry}}
+{{end}}
 ExecReload=/bin/kill -s HUP $MAINPID
 # Having non-zero Limit*s causes performance problems due to accounting overhead
 # in the kernel. We recommend using cgroups to do container-local accounting.
