@@ -10,24 +10,26 @@ import (
 )
 
 func DeployDocker(k8snodeips ...string) bool {
-	ctx := template.Must(template.ParseFiles(
-		viper.GetString("docker.template")))
-	map_ctx := map[string]string{
-		"docker_hub_mirror":    viper.GetString("docker.docker_hub_mirror"),
-		"docker_gcr_io_mirror": viper.GetString("docker.docker_gcr_io_mirror")}
-	harbor_registry := viper.GetString("docker.harbor_registry")
-	if "" != harbor_registry {
-		map_ctx["harbor_registry"] = harbor_registry
+	funcMap := template.FuncMap{
+		"minus": func(a, b int) int {
+			return a - b
+		},
 	}
+	ctx := template.Must(template.New("docker.service.template").Funcs(
+		funcMap).ParseFiles(viper.GetString("docker.template")))
+	insecure_registrys := viper.GetStringSlice("docker.insecure_registrys")
+	map_ctx := map[string]interface{}{
+		"docker_hub_mirror":  viper.GetString("docker.docker_hub_mirror"),
+		"insecure_registrys": insecure_registrys}
 	writer, err := os.Create("/tmp/docker.service")
 	if nil != err {
 		logging.LOG.Errorf(
-			"Cannot create docker service config file:%v", err)
+			"Cannot create docker service config file:%v\n", err)
 		return false
 	}
 	if err = ctx.Execute(writer, map_ctx); nil != err {
 		logging.LOG.Errorf(
-			"Cannot parse docker service config file:%v", err)
+			"Cannot parse docker service config file:%v\n", err)
 		return false
 	}
 	cmd := "systemctl daemon-reload;systemctl enable docker;systemctl restart docker"

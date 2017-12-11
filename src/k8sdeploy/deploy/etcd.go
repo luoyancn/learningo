@@ -69,7 +69,7 @@ func DeployEtcd(k8snodes map[string]string) bool {
 	alias_cmd := `echo "` + alias + `" >> /root/.bashrc`
 	cmd := "chown -R etcd:etcd " + viper.GetString(
 		"etcd.ssl") + ";" + alias_cmd +
-		";systemctl enable ectd;systemctl restart etcd"
+		";systemctl enable etcd;systemctl restart etcd"
 	for _, ip := range ips {
 		go func(ip string) {
 			ssh_conn, err := utils.GetSshConnection(ip, ssh_key)

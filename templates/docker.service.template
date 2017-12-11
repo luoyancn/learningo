@@ -8,6 +8,7 @@ Type=notify
 # the default is not to use systemd for cgroups because the delegate issues still
 # exists and systemd currently does not support the cgroup feature set required
 # for containers run by docker
+{{- $insecure_registrys_len := len .insecure_registrys}}
 ExecStart=/usr/bin/dockerd \
             --host=unix:///var/run/docker.sock \
             --host=tcp://0.0.0.0:2375 \
@@ -18,12 +19,14 @@ ExecStart=/usr/bin/dockerd \
             --storage-driver=overlay2 \
             --selinux-enabled=false \
             --registry-mirror={{.docker_hub_mirror}} \
-{{if not .harbor_registry}}
-            --insecure-registry={{.docker_gcr_io_mirror}}
-{{else}}
-            --insecure-registry={{.docker_gcr_io_mirror}} \
-            --insecure-registry={{.harbor_registry}}
-{{end}}
+{{- range $i, $registry := .insecure_registrys}}
+    {{- if eq (index $i) (minus $insecure_registrys_len 1)}}
+            --insecure-registry={{index $registry}}
+    {{- else}}
+            --insecure-registry={{index $registry}} \
+    {{- end}}
+{{- end}}
+
 ExecReload=/bin/kill -s HUP $MAINPID
 # Having non-zero Limit*s causes performance problems due to accounting overhead
 # in the kernel. We recommend using cgroups to do container-local accounting.
@@ -41,4 +44,3 @@ KillMode=process
 
 [Install]
 WantedBy=multi-user.target
-
