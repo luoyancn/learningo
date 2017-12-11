@@ -18,13 +18,17 @@ ExecStart=/usr/bin/dockerd \
             --log-level=debug \
             --storage-driver=overlay2 \
             --selinux-enabled=false \
+{{- if eq 0 $insecure_registrys_len}}
+            --registry-mirror={{.docker_hub_mirror}}
+{{- else}}
             --registry-mirror={{.docker_hub_mirror}} \
-{{- range $i, $registry := .insecure_registrys}}
+  {{- range $i, $registry := .insecure_registrys}}
     {{- if eq (index $i) (minus $insecure_registrys_len 1)}}
             --insecure-registry={{index $registry}}
     {{- else}}
             --insecure-registry={{index $registry}} \
     {{- end}}
+  {{- end}}
 {{- end}}
 
 ExecReload=/bin/kill -s HUP $MAINPID
