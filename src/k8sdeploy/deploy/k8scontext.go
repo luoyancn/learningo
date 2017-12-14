@@ -43,7 +43,8 @@ func GenerateK8sCtx(k8snodes ...string) bool {
 	cluster_name := viper.GetString("k8s.cluster_name")
 	set_cluster_cmd := exec.Command(kubectl_cmd, "config", "set-cluster",
 		cluster_name, "--embed-certs=true",
-		"--certificate-authority="+ca_pem, "--server="+k8snodes[0])
+		"--certificate-authority="+ca_pem,
+		"--server="+viper.GetString("k8s.api_server"))
 	logging.LOG.Infof("Running the command :%v\n", set_cluster_cmd.Args)
 	if err := set_cluster_cmd.Start(); nil != err {
 		logging.LOG.Fatalf(
