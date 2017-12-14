@@ -3,7 +3,7 @@ debug = false
 
 [k8s]
 target_path = "/usr/bin"
-#nodes = ["192.168.142.18","192.168.142.19","192.168.142.21"]
+
 nodes = {k8snode1="192.168.142.18", k8snode2="192.168.142.19",k8snode3="192.168.142.21"}
 binary_path = "/home/zhangjl/kubernetes/kubernetes"
 config_path = "/etc/kubernetes"
@@ -12,13 +12,32 @@ overwrite_binary = false
 overwrite_ssl = true
 
 cluster_name = "kubernetes"
-tmp = "/tmp"
+apiserver_runtime_config = "rbac.authorization.k8s.io/v1beta1"
+apiserver_secure_port = 5443
+apiserver_insecure_port = 7070
+cluster_service_ip_cidr = "10.20.0.0/16"
+service_node_port_range = "30000-32767"
+cluster_pod_ip_cidr =  "10.10.0.0/16"
+controller_manager_port = 10252
+scheduler_port = 10251
 
+api_insecure_port = 7070
+api_secure_port = 5443
+api_server = "20.30.40.10"
+
+api_server_template = "/opt/github.com/learningo/templates/kube-apiserver.service.template"
+controller_template = "/opt/github.com/learningo/templates/kube-controller-manager.service.template"
+scheduler_template = "/opt/github.com/learningo/templates/kube-scheduler.service.template"
 
 [cfs]
 templates = "/opt/github.com/learningo/templates"
 output = "/opt/github.com/learningo/ca"
 
 [etcd]
-template= "/opt/github.com/learningo/templates/etcd.conf.template"
-nodes = {k8snode1="192.168.142.18", k8snode2="192.168.142.19",k8snode3="192.168.142.21"}
+template = "/opt/github.com/learningo/templates/etcd.conf.template"
+nodes = {k8snode1="20.30.40.10", k8snode2="20.30.40.4",k8snode3="20.30.40.8"}
+
+[docker]
+template = "/opt/github.com/learningo/templates/docker.service.template"
+docker_hub_mirror = "https://docker.mirrors.ustc.edu.cn"
+insecure_registrys = ["registry.cn-hangzhou.aliyuncs.com"]

@@ -78,27 +78,31 @@ func scp_source_to_dest(ssh_conn *ssh.Client, file_type string,
 		return false
 	}
 	defer sftp_client.Close()
-	dest_path_info, err := sftp_client.Stat(dest_path)
 	build_path := true
-	if nil != err {
-		logging.LOG.Warningf(
-			"The target path %s not exsit:%v, Try to create it ...\n",
-			dest_path, err)
-		ssh_session, err := ssh_conn.NewSession()
+	if "file" != file_type {
+		dest_path_info, err := sftp_client.Stat(dest_path)
 		if nil != err {
-			logging.LOG.Errorf("Cannot create ssh tunnel:%v\n", err)
-			return false
-		}
-		cmd := "mkdir -p " + dest_path
-		if err = ssh_session.Run(cmd); nil != err {
-			logging.LOG.Errorf("Cannot create the dest path %s :%v\n",
+			logging.LOG.Warningf(
+				"The target path %s not exsit:%v, Try to create it ...\n",
 				dest_path, err)
-			return false
+			ssh_session, err := ssh_conn.NewSession()
+			if nil != err {
+				logging.LOG.Errorf("Cannot create ssh tunnel:%v\n", err)
+				return false
+			}
+			cmd := "mkdir -p " + dest_path
+			if err = ssh_session.Run(cmd); nil != err {
+				logging.LOG.Errorf("Cannot create the dest path %s :%v\n",
+					dest_path, err)
+				return false
+			}
+		} else {
+			if !dest_path_info.IsDir() {
+				build_path = false
+			}
 		}
 	} else {
-		if !dest_path_info.IsDir() {
-			build_path = false
-		}
+		build_path = false
 	}
 
 	//	scp_res := make(chan bool, len(binarys))
@@ -240,6 +244,47 @@ func SCPFiles(source_path []string, dest_path string,
 
 	for index := 0; index < len(k8snodes); index++ {
 		if !<-ssh_res {
+			return false
+		}
+	}
+	return true
+}
+
+func RemoteCmd(cmd string, ips ...string) bool {
+	ssh_key := GenerateSshAuthConfig()
+	result := make(chan bool, len(ips))
+	runtime.GOMAXPROCS(len(ips))
+	for _, ip := range ips {
+		go func(ip string) {
+			ssh_conn, err := GetSshConnection(ip, ssh_key)
+			if nil != err {
+				logging.LOG.Errorf("Cannot connect to host %s:%v\n", ip, err)
+				result <- false
+				return
+			}
+			defer ssh_conn.Close()
+			session, err := ssh_conn.NewSession()
+			if nil != err {
+				logging.LOG.Errorf(
+					"Cannot connect to host %s to exec:%v\n", ip, err)
+				result <- false
+				return
+			}
+			defer session.Close()
+			logging.LOG.Noticef("Waiting to execute command:%s\n", cmd)
+			if err = session.Run(cmd); nil != err {
+				logging.LOG.Errorf(
+					"Fail to change the file owner on host %s  :%v\n",
+					ip, err)
+				result <- false
+				return
+			}
+			result <- true
+		}(ip)
+	}
+
+	for i := 0; i < len(ips); i++ {
+		if !<-result {
 			return false
 		}
 	}

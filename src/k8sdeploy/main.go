@@ -54,11 +54,22 @@ Deploy the docker service with golang tools.
 	Run:    initdocker,
 }
 
+var k8smasterCmd = &cobra.Command{
+	Use:   "deploy-k8s-master",
+	Short: "Deploy the k8s master",
+	Long: `
+Deploy the k8s manster service with golang tools.
+`,
+	PreRun: preparenv,
+	Run:    initk8smaster,
+}
+
 func init() {
 	once.Do(func() {
 		rootcmd.AddCommand(initCmd)
 		rootcmd.AddCommand(etcdCmd)
 		rootcmd.AddCommand(dockerCmd)
+		rootcmd.AddCommand(k8smasterCmd)
 		rootcmd.PersistentFlags().StringVarP(
 			&configfile, "config-file", "c", "",
 			"The full path of config file")
@@ -176,6 +187,10 @@ func initdocker(cmd *cobra.Command, args []string) {
 			"Failed to generate the docker service config file on all k8snodes\n")
 		os.Exit(-1)
 	}
+}
+
+func initk8smaster(cmd *cobra.Command, args []string) {
+	deploy.Deployk8sMaster(k8snode_map_ip)
 }
 
 func Execute() {

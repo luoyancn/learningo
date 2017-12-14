@@ -1,0 +1,46 @@
+[Unit]
+Description=Kubernetes API Server
+Documentation=https://github.com/kubernetes/kubernetes
+After=network.target
+
+[Service]
+User=root
+
+ExecStart=/usr/bin/kube-apiserver \
+            --admission-control=DefaultStorageClass,LimitRanger,NamespaceLifecycle,NodeRestriction,ResourceQuota,ServiceAccount \
+            --advertise-address={{.api_server}} \
+            --allow-privileged=true \
+            --apiserver-count={{.apiserver_count}} \
+            --authorization-mode=RBAC,Node \
+            --bind-address={{.api_server}} \
+            --client-ca-file=/etc/kubernetes/ssl/ca.pem \
+            --cloud-config= \
+            --cloud-provider= \
+            --enable-swagger-ui=true --etcd-cafile=/etc/kubernetes/ssl/ca.pem --etcd-certfile=/etc/kubernetes/ssl/kubernetes.pem --etcd-keyfile=/etc/kubernetes/ssl/kubernetes-key.pem \
+            --etcd-prefix=/kubernetes \
+            --etcd-servers={{.etcd_servers}} \
+            --event-ttl=1h \
+            --experimental-bootstrap-token-auth \
+            --insecure-bind-address={{.api_server}} \
+            --insecure-port={{.apiserver_insecure_port}} \
+            --kubelet-https=true \
+            --log-dir=/var/log/kubernetes \
+            --log-flush-frequency=5s \
+            --logtostderr=false \
+            --runtime-config={{.apiserver_runtime_config}},networking.k8s.io/v1 \
+            --secure-port={{.apiserver_secure_port}} \
+            --service-account-key-file=/etc/kubernetes/ssl/ca-key.pem \
+            --service-cluster-ip-range={{.cluster_service_ip_cidr}}\
+            --service-node-port-range={{.service_node_port_range}} \
+            --tls-cert-file=/etc/kubernetes/ssl/kubernetes.pem \
+            --tls-private-key-file=/etc/kubernetes/ssl/kubernetes-key.pem \
+            --token-auth-file=/etc/kubernetes/token.csv \
+            --v=0
+
+Restart=on-failure
+RestartSec=5
+Type=notify
+LimitNOFILE=65536
+
+[Install]
+WantedBy=multi-user.target

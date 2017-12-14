@@ -1,0 +1,40 @@
+[Unit]
+Description=Kubernetes Controller Manager
+Documentation=https://github.com/kubernetes/kubernetes
+After=network.target
+
+[Service]
+User=root
+ExecStart=/usr/bin/kube-controller-manager \
+            --address=127.0.0.1 \
+            --allocate-node-cidrs=false \
+            --alsologtostderr \
+            --cloud-config= \
+            --cloud-provider= \
+            --cluster-cidr={{.cluster_pod_ip_cidr}} \
+            --cluster-name={{.cluster_name}} \
+            --cluster-signing-cert-file=/etc/kubernetes/ssl/ca.pem \
+            --cluster-signing-key-file=/etc/kubernetes/ssl/ca-key.pem \
+            --configure-cloud-routes=false \
+            --controller-start-interval=0 \
+            --leader-elect=true \
+            --leader-elect-lease-duration=15s \
+            --leader-elect-renew-deadline=10s \
+            --leader-elect-retry-period=2s \
+            --log-dir=/var/log/kubernetes \
+            --log-flush-frequency=5s \
+            --logtostderr=false \
+            --master={{.insecure_apiserver}} \
+            --node-cidr-mask-size=20 \
+            --port={{.controller_manager_port}} \
+            --root-ca-file=/etc/kubernetes/ssl/ca.pem \
+            --service-account-private-key-file=/etc/kubernetes/ssl/ca-key.pem \
+            --service-cluster-ip-range={{.cluster_service_ip_cidr}} \
+            --v=0
+Restart=on-failure
+RestartSec=5
+Type=simple
+LimitNOFILE=65536
+
+[Install]
+WantedBy=multi-user.target
