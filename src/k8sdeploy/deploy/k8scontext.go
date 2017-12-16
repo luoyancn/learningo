@@ -34,7 +34,7 @@ func GenerateK8sCtx(k8snodes ...string) bool {
 
 	var admin_ca_pem string
 	decide_cmd_and_path("k8s.ssl_config_path",
-		"cfs.output", "admin-ca.pem", &admin_ca_pem)
+		"cfs.output", "admin.pem", &admin_ca_pem)
 
 	var admin_key_pem string
 	decide_cmd_and_path("k8s.ssl_config_path",
@@ -44,7 +44,8 @@ func GenerateK8sCtx(k8snodes ...string) bool {
 	set_cluster_cmd := exec.Command(kubectl_cmd, "config", "set-cluster",
 		cluster_name, "--embed-certs=true",
 		"--certificate-authority="+ca_pem,
-		"--server="+viper.GetString("k8s.api_server"))
+		"--server=https://"+viper.GetString("k8s.api_server")+":"+
+			viper.GetString("k8s.apiserver_secure_port"))
 	logging.LOG.Infof("Running the command :%v\n", set_cluster_cmd.Args)
 	if err := set_cluster_cmd.Start(); nil != err {
 		logging.LOG.Fatalf(

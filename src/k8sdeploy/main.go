@@ -1,7 +1,7 @@
 package k8sdeploy
 
 import (
-	_ "k8sdeploy/conf"
+	"k8sdeploy/conf"
 	"k8sdeploy/deploy"
 	"k8sdeploy/logging"
 	"k8sdeploy/utils"
@@ -64,12 +64,33 @@ Deploy the k8s manster service with golang tools.
 	Run:    initk8smaster,
 }
 
+var k8snodeCmd = &cobra.Command{
+	Use:   "deploy-k8s-node",
+	Short: "Deploy the k8s ndoes",
+	Long: `
+Deploy the k8s nodes service with golang tools.
+`,
+	PreRun: preparenv,
+	Run:    initk8snode,
+}
+
+var calicoCmd = &cobra.Command{
+	Use:   "deploy-calico",
+	Short: "Deploy the calico",
+	Long: `
+Deploy the calic network service with golang tools.
+`,
+	PreRun: preparenv,
+	Run:    initcalico,
+}
+
 func init() {
 	once.Do(func() {
 		rootcmd.AddCommand(initCmd)
 		rootcmd.AddCommand(etcdCmd)
 		rootcmd.AddCommand(dockerCmd)
 		rootcmd.AddCommand(k8smasterCmd)
+		rootcmd.AddCommand(k8snodeCmd)
 		rootcmd.PersistentFlags().StringVarP(
 			&configfile, "config-file", "c", "",
 			"The full path of config file")
@@ -83,6 +104,7 @@ func read_config() {
 		log.Printf("ERROR:%v\n", err)
 		os.Exit(-1)
 	}
+	conf.OverWriteConf()
 	logging.GetLogger()
 }
 
@@ -158,7 +180,6 @@ func initk8senv(cmd *cobra.Command, args []string) {
 			"Failed to prepare ca-key files on all k8snodes\n")
 		os.Exit(-1)
 	}
-
 	if !deploy.GenerateK8sCtx(k8snodeips...) {
 		logging.LOG.Critical(
 			"Failed to generate the kubernetes context on all k8snodes\n")
@@ -170,7 +191,6 @@ func initk8senv(cmd *cobra.Command, args []string) {
 			"Failed to generate the kubernetes config file on all k8snodes\n")
 		os.Exit(-1)
 	}
-
 }
 
 func initetcd(cmd *cobra.Command, args []string) {
@@ -190,6 +210,14 @@ func initdocker(cmd *cobra.Command, args []string) {
 }
 
 func initk8smaster(cmd *cobra.Command, args []string) {
+	deploy.Deployk8sMaster(k8snode_map_ip)
+}
+
+func initk8snode(cmd *cobra.Command, args []string) {
+	deploy.DeployK8sNode()
+}
+
+func initcalico(cmd *cobra.Command, args []string) {
 	deploy.Deployk8sMaster(k8snode_map_ip)
 }
 

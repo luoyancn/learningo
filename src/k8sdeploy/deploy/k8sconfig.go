@@ -64,7 +64,8 @@ func GenerateK8sConfig(k8snodes ...string) bool {
 
 	set_cluster_cmd := exec.Command(kubectl_cmd, "config", "set-cluster",
 		cluster_name, "--embed-certs=true",
-		"--server="+viper.GetString("k8s.api_server"),
+		"--server=https://"+viper.GetString("k8s.api_server")+":"+
+			viper.GetString("k8s.apiserver_secure_port"),
 		"--certificate-authority="+ca_pem, kubeconfig)
 	logging.LOG.Infof("Running the command :%v\n", set_cluster_cmd.Args)
 	if err := set_cluster_cmd.Start(); nil != err {
@@ -105,7 +106,9 @@ func GenerateK8sConfig(k8snodes ...string) bool {
 
 	set_proxy_cluster_cmd := exec.Command(
 		kubectl_cmd, "config", "set-cluster", cluster_name,
-		"--embed-certs=true", "--server="+viper.GetString("k8s.api_server"),
+		"--embed-certs=true", "--server=https://"+
+			viper.GetString("k8s.api_server")+
+			":"+viper.GetString("k8s.apiserver_secure_port"),
 		"--certificate-authority="+ca_pem, kubeproxyconfig)
 	logging.LOG.Infof("Running the command :%v\n", set_proxy_cluster_cmd.Args)
 	if err := set_proxy_cluster_cmd.Start(); nil != err {

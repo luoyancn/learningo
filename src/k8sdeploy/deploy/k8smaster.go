@@ -105,6 +105,6 @@ func Deployk8sMaster(k8snodes map[string]string) bool {
 		"", true, ips...) {
 		return false
 	}
-	cmd := "mkdir -p /var/log/kubernetes;for id in kube-{apiserver,controller-manager,scheduler};do systemctl enable $id;systemctl restart $id;done"
+	cmd := "mkdir -p /var/log/kubernetes;for id in kube-{apiserver,controller-manager,scheduler};do systemctl daemon-reload;systemctl enable $id;systemctl restart $id;done"
 	return utils.RemoteCmd(cmd, ips...)
 }

@@ -274,8 +274,8 @@ func RemoteCmd(cmd string, ips ...string) bool {
 			logging.LOG.Noticef("Waiting to execute command:%s\n", cmd)
 			if err = session.Run(cmd); nil != err {
 				logging.LOG.Errorf(
-					"Fail to change the file owner on host %s  :%v\n",
-					ip, err)
+					"Fail to execute the command %s on host %s :%v\n",
+					cmd, ip, err)
 				result <- false
 				return
 			}

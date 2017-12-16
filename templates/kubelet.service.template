@@ -1,0 +1,44 @@
+[Unit]
+Description=Kubernetes Kubelet Server
+Documentation=https://github.com/kubernetes/kubernetes
+After=docker.service
+Requires=docker.service
+
+[Service]
+User=root
+
+WorkingDirectory=/var/lib/kubelet
+
+ExecStart=/usr/bin/kubelet \
+            --address={{.node_ip}} \
+            --allow-privileged=true \
+            --bootstrap-kubeconfig=/etc/kubernetes/kubelet-bootstrap.kubeconfig \
+            --cadvisor-port={{.kube_cadvisor_port}} \
+            --cert-dir=/etc/kubernetes/ssl \
+            --cni-bin-dir=/usr/bin \
+            --cni-conf-dir=/etc/cni/net.d \
+            --cloud-config= \
+            --cloud-provider= \
+            --cluster-dns={{.kube_cluster_dns_svc_ip}} \
+            --cluster-domain={{.kube_dns_domain}} \
+            --fail-swap-on=false \
+            --healthz-port={{.kubelet_healthz_port}} \
+            --hostname-override= \
+            --kubeconfig=/etc/kubernetes/kubelet.kubeconfig \
+            --log-dir=/var/log/kubernetes \
+            --log-flush-frequency=5s \
+            --logtostderr=false \
+            --network-plugin=cni \
+            --pod-infra-container-image={{.kube_pod_infra_image}} \
+            --port={{.kubelet_port}} \
+            --read-only-port={{.kubelet_readonly_port}} \
+            --register-node=true \
+            --v=0
+
+Restart=on-failure
+RestartSec=5
+Type=simple
+LimitNOFILE=65536
+
+[Install]
+WantedBy=multi-user.target
