@@ -1,7 +1,10 @@
 [default]
-debug = false
+# Log operations with debug level.Default is false
+#debug = false
+# The full path of log file
+# log_file = "k8sdeploy.log"
 
-[k8s]
+[kubernetes]
 target_path = "/usr/bin"
 
 nodes = {k8snode1="192.168.142.18", k8snode2="192.168.142.19",k8snode3="192.168.142.21"}
@@ -40,22 +43,40 @@ api_server_template = "/opt/github.com/learningo/templates/kube-apiserver.servic
 controller_template = "/opt/github.com/learningo/templates/kube-controller-manager.service.template"
 scheduler_template = "/opt/github.com/learningo/templates/kube-scheduler.service.template"
 
-
-
-[cfs]
-templates = "/opt/github.com/learningo/initca"
+[ca]
+# The path to store the ca json info files
+template_path = "/opt/github.com/learningo/initca"
+# The path to store the ca pem and key files
 output = "/opt/github.com/learningo/ca"
+# Overwrite the ca pem files. Default is true.
+#overwrite = true
 
 [etcd]
-template = "/opt/github.com/learningo/templates/etcd.conf.template"
+# The template file for etcd config file
+template = "etcd.conf.template"
+# The etcd servers, hostname and ip mapping
 nodes = {k8snode1="20.30.40.10", k8snode2="20.30.40.4",k8snode3="20.30.40.8"}
+# Overwrite the etcd config file. Default is true.
+#overwrite = true
 
 [docker]
+# The template file of docker service
 template = "/opt/github.com/learningo/templates/docker.service.template"
-docker_hub_mirror = "https://docker.mirrors.ustc.edu.cn"
-insecure_registrys = ["registry.cn-hangzhou.aliyuncs.com"]
+# Docker hub mirror
+#docker_hub_mirror = "https://docker.mirrors.ustc.edu.cn"
+# The insecure registry of docker, Default is []
+#insecure_registrys = []
+# Overwrite the docker service file. Default is true.
+#overwrite = true
 
 [calico]
-cni_bin_path = "/usr/bin"
-cni_conf_path = "/etc/cni/net.d"
-binary_path = "/home/zhangjl/kubernetes/calico"
+# The path of calicoctl on target host.Default is /usr/local/bin
+#cni_bin_path = "/usr/local/bin"
+# The path of calico config file.Default is /etc/cni/net.d
+#cni_conf_path = "/etc/cni/net.d"
+# The binary path of calico
+cni_binary= "/home/zhangjl/kubernetes/calico"
+# Overwrite the calico binary file. Default is false.
+#overwrite_binary = false
+# Overwrite the calico config file. Default is true.
+#overwrite_file = true

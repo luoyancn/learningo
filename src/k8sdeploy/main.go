@@ -4,7 +4,6 @@ import (
 	"k8sdeploy/conf"
 	"k8sdeploy/deploy"
 	"k8sdeploy/logging"
-	"k8sdeploy/utils"
 	"log"
 	"os"
 	"sync"
@@ -106,6 +105,16 @@ func read_config() {
 	}
 	conf.OverWriteConf()
 	logging.GetLogger()
+
+	if conf.DEBUG {
+		for key, value := range viper.AllSettings() {
+			settings := value.(map[string]interface{})
+			for setting_key, setting_value := range settings {
+				logging.LOG.Noticef(
+					"%s.%s\t%v\n", key, setting_key, setting_value)
+			}
+		}
+	}
 }
 
 func preparenv(cmd *cobra.Command, args []string) {
@@ -114,50 +123,21 @@ func preparenv(cmd *cobra.Command, args []string) {
 		logging.LOG.Criticalf("Please execute this file with root permision\n")
 		os.Exit(-1)
 	}
-	if !viper.IsSet("k8s.nodes") {
+	if !viper.IsSet("kubernetes.k8s_nodes") {
 		msg := "Please ensure k8snodes confired in config files"
 		logging.LOG.Criticalf(msg)
 		os.Exit(-1)
 	}
-	if !viper.IsSet("k8s.binary_path") {
+	if !viper.IsSet("kubernetes.k8s_binary") {
 		msg := "Please tell me where were your k8s binarys" +
-			" in [k8s] section with binary_path\n"
+			" in [kubernetes] section with binary\n"
 		logging.LOG.Criticalf(msg)
 		os.Exit(-1)
 	}
-	if !viper.IsSet("cfs.templates") {
+	if !viper.IsSet("ca.template_path") {
 		msg := "Please tell me where were your templates for generate ca" +
 			" files in [cfs] section with templates\n"
 		logging.LOG.Criticalf(msg)
-		os.Exit(-1)
-	}
-
-	//k8snodes = viper.GetStringSlice("k8s.nodes")
-	k8snode_map_ip = viper.GetStringMapString("k8s.nodes")
-	for node, ip := range k8snode_map_ip {
-		k8snodes = append(k8snodes, node)
-		k8snodeips = append(k8snodeips, ip)
-	}
-	/*
-		hostname, err := os.Hostname()
-		if nil != err {
-			logging.LOG.Critical(
-				"Cannot get the hostname of this nodes:%v\n", err)
-			os.Exit(-1)
-		}
-			logging.LOG.Noticef("%s\n", hostname)
-			for _, host := range k8snodes {
-				if hostname == host {
-					break
-				}
-				logging.LOG.Noticef(
-					"Please execute this programs on one of k8snodes\n")
-				os.Exit(-1)
-			}
-	*/
-	if !utils.SSHCheck(k8snodeips...) {
-		logging.LOG.Criticalf(
-			"Please ensure noauth-ssh configurated on all k8snodes\n")
 		os.Exit(-1)
 	}
 }
