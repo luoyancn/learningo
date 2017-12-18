@@ -1,25 +1,23 @@
 package deploy
 
 import (
+	"k8sdeploy/conf"
 	"k8sdeploy/utils"
-
-	"github.com/spf13/viper"
 )
 
 func PrepareK8SBinary(nodes ...string) bool {
-	binary_files_path := viper.GetString("k8s.binary_path")
-	dest_binary_path := viper.GetString("k8s.target_path")
-	overwrite_k8s_binary := viper.GetBool("k8s.overwrite_binary")
-	calico_path := viper.GetString("calico.binary_path")
-	return utils.SCPFiles([]string{binary_files_path, calico_path},
+	binary_files_path := conf.KUBERNETES_K8S_BINARY
+	dest_binary_path := conf.KUBERNETES_K8S_BIN_PATH
+	overwrite_k8s_binary := conf.KUBERNETES_K8S_OVERWRITE_BINARY
+	return utils.SCPFiles([]string{binary_files_path},
 		dest_binary_path, "binary", overwrite_k8s_binary, nodes...)
 }
 
 func PrepareCAKey(nodes ...string) bool {
-	source_json_path := viper.GetString("cfs.templates")
-	source_ca_path := viper.GetString("cfs.output")
-	dest_ca_path := viper.GetString("k8s.ssl_config_path")
-	overwrite_k8s_ssl := viper.GetBool("k8s.overwrite_ssl")
+	source_json_path := conf.CA_TEMPLATE_PATH
+	source_ca_path := conf.CA_OUTPUT
+	dest_ca_path := conf.KUBERNETES_K8S_SSL_CONFIG_PATH
+	overwrite_ca := conf.CA_OVERWRITE
 	return utils.SCPFiles([]string{source_json_path, source_ca_path},
-		dest_ca_path, "", overwrite_k8s_ssl, nodes...)
+		dest_ca_path, "", overwrite_ca, nodes...)
 }

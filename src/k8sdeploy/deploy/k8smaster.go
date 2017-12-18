@@ -1,13 +1,12 @@
 package deploy
 
 import (
+	"k8sdeploy/conf"
 	"k8sdeploy/logging"
 	"k8sdeploy/utils"
 	"os"
 	"strings"
 	"text/template"
-
-	"github.com/spf13/viper"
 )
 
 func Deployk8sMaster(k8snodes map[string]string) bool {
@@ -15,42 +14,42 @@ func Deployk8sMaster(k8snodes map[string]string) bool {
 	for _, ip := range k8snodes {
 		ips = append(ips, ip)
 	}
-	k8sapis := viper.GetStringMapString("etcd.nodes")
+	k8sapis := conf.ETCD_NODES
 	etcd_servers_array := []string{}
 	for _, ip := range k8sapis {
-		etcd_server := "https://" + ip + ":2379"
+		etcd_server := conf.ETCD_PROTOCAL + "://" + ip + ":2379"
 		etcd_servers_array = append(etcd_servers_array, etcd_server)
 	}
 	etcd_servers := strings.Join(etcd_servers_array, ",")
 	api_ctx := template.Must(
-		template.ParseFiles(viper.GetString("k8s.api_server_template")))
+		template.ParseFiles(conf.KUBERNETES_K8S_API_SERVER_TEMPLATE))
 	controller_ctx := template.Must(
-		template.ParseFiles(viper.GetString("k8s.controller_template")))
+		template.ParseFiles(conf.KUBERNETES_K8S_CONTROLLER_TEMPLATE))
 	scheduler_ctx := template.Must(
-		template.ParseFiles(viper.GetString("k8s.scheduler_template")))
+		template.ParseFiles(conf.KUBERNETES_K8S_SCHEDULER_TEMPLATE))
 
-	cluster_service_ip_cidr := viper.GetString("k8s.cluster_service_ip_cidr")
+	cluster_service_ip_cidr := conf.KUBERNETES_K8S_CLUSTER_SERVICE_IP_CIDR
 
 	api_map := map[string]interface{}{
 		"etcd_servers":             etcd_servers,
 		"apiserver_count":          len(k8sapis),
-		"apiserver_insecure_port":  viper.GetString("k8s.apiserver_insecure_port"),
-		"apiserver_runtime_config": viper.GetString("k8s.apiserver_runtime_config"),
-		"apiserver_secure_port":    viper.GetString("k8s.apiserver_secure_port"),
+		"apiserver_insecure_port":  conf.KUBERNETES_K8S_APISERVER_INSECURE_PORT,
+		"apiserver_runtime_config": conf.KUBERNETES_K8S_APISERVER_RUNTIME_CONFIG,
+		"apiserver_secure_port":    conf.KUBERNETES_K8S_APISERVER_SECURE_PORT,
 		"cluster_service_ip_cidr":  cluster_service_ip_cidr,
-		"service_node_port_range":  viper.GetString("k8s.service_node_port_range")}
+		"service_node_port_range":  conf.KUBERNETES_K8S_SERVICE_NODE_PORT_RANGE}
 
-	insecure_apiserver := "http://" + viper.GetString("k8s.api_server") +
-		":" + viper.GetString("k8s.api_insecure_port")
+	insecure_apiserver := "http://" + conf.KUBERNETES_K8S_API_SERVER +
+		":" + string(conf.KUBERNETES_K8S_APISERVER_INSECURE_PORT)
 	controller_map := map[string]interface{}{
-		"cluster_pod_ip_cidr":     viper.GetString("k8s.cluster_pod_ip_cidr"),
+		"cluster_pod_ip_cidr":     conf.KUBERNETES_K8S_CLUSTER_POD_IP_CIDR,
 		"cluster_service_ip_cidr": cluster_service_ip_cidr,
 		"insecure_apiserver":      insecure_apiserver,
-		"controller_manager_port": viper.GetInt("k8s.controller_manager_port"),
-		"cluster_name":            viper.GetString("k8s.cluster_name")}
+		"controller_manager_port": conf.KUBERNETES_K8S_CONTROLLER_MANAGER_PORT,
+		"cluster_name":            conf.KUBERNETES_K8S_CLUSTER_NAME}
 
 	scheduler_map := map[string]interface{}{
-		"scheduler_port":     viper.GetString("k8s.scheduler_port"),
+		"scheduler_port":     conf.KUBERNETES_K8S_SCHEDULER_PORT,
 		"insecure_apiserver": insecure_apiserver}
 
 	controller_writer, err := os.Create(

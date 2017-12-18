@@ -123,22 +123,46 @@ func preparenv(cmd *cobra.Command, args []string) {
 		logging.LOG.Criticalf("Please execute this file with root permision\n")
 		os.Exit(-1)
 	}
-	if !viper.IsSet("kubernetes.k8s_nodes") {
+	if 0 >= len(conf.KUBERNETES_K8S_NODES) {
 		msg := "Please ensure k8snodes confired in config files"
 		logging.LOG.Criticalf(msg)
 		os.Exit(-1)
 	}
-	if !viper.IsSet("kubernetes.k8s_binary") {
+	if "" == conf.KUBERNETES_K8S_BINARY {
 		msg := "Please tell me where were your k8s binarys" +
-			" in [kubernetes] section with binary\n"
+			" in [kubernetes] section with k8s_binary\n"
 		logging.LOG.Criticalf(msg)
 		os.Exit(-1)
 	}
-	if !viper.IsSet("ca.template_path") {
+
+	// Check the required configurations in [ca] section
+	if "" == conf.CA_TEMPLATE_PATH {
 		msg := "Please tell me where were your templates for generate ca" +
-			" files in [cfs] section with templates\n"
+			" files in [ca] section with template_path\n"
 		logging.LOG.Criticalf(msg)
 		os.Exit(-1)
+	}
+	if _, err := os.Stat(conf.CA_TEMPLATE_PATH); os.IsNotExist(err) {
+		logging.LOG.Criticalf(
+			"Please ensure your ca template path %s exist\n",
+			conf.CA_TEMPLATE_PATH)
+		os.Exit(-1)
+	}
+	if "" == conf.CA_OUTPUT {
+		msg := "Please tell me where to put your generated ca files" +
+			" files in [ca] section with output\n"
+		logging.LOG.Criticalf(msg)
+		os.Exit(-1)
+	}
+	if _, err := os.Stat(conf.CA_OUTPUT); os.IsNotExist(err) {
+		logging.LOG.Warningf(
+			"The ca out put path %s not exist, try to creat it \n",
+			conf.CA_TEMPLATE_PATH)
+		err := os.MkdirAll(conf.CA_OUTPUT, 0700)
+		if nil != err {
+			logging.LOG.Criticalf("Cannot to create the ca out path:%v\n", err)
+			os.Exit(-1)
+		}
 	}
 }
 
@@ -198,7 +222,6 @@ func initk8snode(cmd *cobra.Command, args []string) {
 }
 
 func initcalico(cmd *cobra.Command, args []string) {
-	deploy.Deployk8sMaster(k8snode_map_ip)
 }
 
 func Execute() {

@@ -1,11 +1,11 @@
 package logging
 
 import (
+	"k8sdeploy/conf"
 	"os"
 	"sync"
 
 	gologging "github.com/op/go-logging"
-	"github.com/spf13/viper"
 )
 
 var LOG *gologging.Logger
@@ -27,7 +27,7 @@ func GetLogger() {
 	once.Do(func() {
 		LOG = gologging.MustGetLogger("k8sdeploy")
 		logfile, err := os.OpenFile(
-			viper.GetString("default.log_file"),
+			conf.LOGFILE,
 			os.O_RDWR|os.O_CREATE|os.O_APPEND, 0666)
 		if err != nil {
 			LOG.Panicf("Cannot create the log file :%v\n", err)
@@ -41,7 +41,7 @@ func GetLogger() {
 			std_backend, format_std)
 
 		gologging.SetBackend(file_back_formater, std_back_formater)
-		if viper.GetBool("default.debug") {
+		if conf.DEBUG {
 			gologging.SetLevel(gologging.DEBUG, "")
 		} else {
 			gologging.SetLevel(gologging.INFO, "")

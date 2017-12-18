@@ -2,37 +2,35 @@ package deploy
 
 import (
 	"fmt"
+	"k8sdeploy/conf"
 	"k8sdeploy/logging"
 	"k8sdeploy/utils"
 	"os"
 	"strings"
 	"text/template"
-
-	"github.com/spf13/viper"
 )
 
 func DeployEtcd(k8snodes map[string]string) bool {
 	ctx := template.Must(template.ParseFiles(
-		viper.GetString("etcd.template")))
+		conf.ETCD_TEMPLATE))
 
-	etcd_ssl := viper.GetString("etcd.ssl")
 	map_ctx := map[string]interface{}{
-		"etcd_protocal":    viper.GetString("etcd.protocal"),
-		"etcd_token":       viper.GetString("etcd.cluster_token"),
-		"client_cert_auth": viper.GetBool("etcd.client_cert_auth"),
-		"peer_cert_auth":   viper.GetBool("etcd.peer_cert_auth"),
-		"etcd_ssl":         etcd_ssl,
-		"etcd_debug":       viper.GetBool("etcd.debug")}
+		"etcd_protocal":    conf.ETCD_PROTOCAL,
+		"etcd_token":       conf.ETCD_TOKEN,
+		"client_cert_auth": conf.ETCD_CLIENT_CERT_AUTH,
+		"peer_cert_auth":   conf.ETCD_PEER_CERT_AUTH,
+		"etcd_ssl":         conf.ETCD_SSL,
+		"etcd_debug":       conf.ETCD_DEBUG}
 
-	etcd_nodes := viper.GetStringMapString("etcd.nodes")
+	etcd_nodes := conf.ETCD_NODES
 	nodes := []string{}
 	ips := []string{}
 	endpoints := []string{}
 	for name, ip := range etcd_nodes {
 		nodes = append(
-			nodes, name+"="+map_ctx["etcd_protocal"].(string)+"://"+ip+":2380")
+			nodes, name+"="+conf.ETCD_PROTOCAL+"://"+ip+":2380")
 		endpoints = append(
-			endpoints, map_ctx["etcd_protocal"].(string)+"://"+ip+":2379")
+			endpoints, conf.ETCD_PROTOCAL+"://"+ip+":2379")
 	}
 	etcd_cluster := strings.Join(nodes, ",")
 	etcd_endpoints := strings.Join(endpoints, ",")
@@ -55,9 +53,9 @@ func DeployEtcd(k8snodes map[string]string) bool {
 		ips = append(ips, k8snodes[name])
 	}
 
-	source_ca_path := viper.GetString("cfs.output")
+	source_ca_path := conf.CA_OUTPUT
 	if !utils.SCPFiles([]string{source_ca_path},
-		viper.GetString("etcd.ssl"), "", true, ips...) {
+		conf.ETCD_SSL, "", true, ips...) {
 		return false
 	}
 	ssh_key := utils.GenerateSshAuthConfig()
@@ -65,10 +63,9 @@ func DeployEtcd(k8snodes map[string]string) bool {
 	alias := fmt.Sprintf("alias etcdctl='etcdctl --endpoints=%s "+
 		"--ca-file=%s/ca.pem --cert-file=%s/kubernetes.pem "+
 		" --key-file=%s/kubernetes-key.pem'",
-		etcd_endpoints, etcd_ssl, etcd_ssl, etcd_ssl)
+		etcd_endpoints, conf.ETCD_SSL, conf.ETCD_SSL, conf.ETCD_SSL)
 	alias_cmd := `echo "` + alias + `" >> /root/.bashrc`
-	cmd := "chown -R etcd:etcd " + viper.GetString(
-		"etcd.ssl") + ";" + alias_cmd +
+	cmd := "chown -R etcd:etcd " + conf.ETCD_SSL + ";" + alias_cmd +
 		";systemctl enable etcd;systemctl restart etcd"
 	for _, ip := range ips {
 		go func(ip string) {

@@ -1,51 +1,25 @@
 package deploy
 
 import (
+	"k8sdeploy/conf"
 	"k8sdeploy/logging"
 	"k8sdeploy/utils"
-	"os"
 	"os/exec"
 	"path/filepath"
-
-	"github.com/spf13/viper"
 )
 
-func decide_cmd_and_path(config_target_path string,
-	config_source_path string, cmd_or_file_name string,
-	cmd_or_file_path *string) {
-	target_path := filepath.Join(
-		viper.GetString(config_target_path), cmd_or_file_name)
-	if _, err := os.Stat(target_path); os.IsNotExist(err) {
-		*cmd_or_file_path = filepath.Join(
-			viper.GetString(config_source_path), cmd_or_file_name)
-	} else {
-		*cmd_or_file_path = target_path
-	}
-}
-
 func GenerateK8sCtx(k8snodes ...string) bool {
-	var kubectl_cmd string
-	decide_cmd_and_path("k8s.target_path",
-		"k8s.binary_path", "kubectl", &kubectl_cmd)
+	kubectl_cmd := filepath.Join(conf.KUBERNETES_K8S_BINARY, "kubectl")
+	ca_pem := filepath.Join(conf.CA_OUTPUT, "ca.pem")
+	admin_ca_pem := filepath.Join(conf.CA_OUTPUT, "admin.pem")
+	admin_key_pem := filepath.Join(conf.CA_OUTPUT, "admin-key.pem")
 
-	var ca_pem string
-	decide_cmd_and_path("k8s.ssl_config_path",
-		"cfs.output", "ca.pem", &ca_pem)
-
-	var admin_ca_pem string
-	decide_cmd_and_path("k8s.ssl_config_path",
-		"cfs.output", "admin.pem", &admin_ca_pem)
-
-	var admin_key_pem string
-	decide_cmd_and_path("k8s.ssl_config_path",
-		"cfs.output", "admin-key.pem", &admin_key_pem)
-
-	cluster_name := viper.GetString("k8s.cluster_name")
+	cluster_name := conf.KUBERNETES_K8S_CLUSTER_NAME
 	set_cluster_cmd := exec.Command(kubectl_cmd, "config", "set-cluster",
 		cluster_name, "--embed-certs=true",
 		"--certificate-authority="+ca_pem,
-		"--server=https://"+viper.GetString("k8s.api_server")+":"+
-			viper.GetString("k8s.apiserver_secure_port"))
+		"--server=https://"+conf.KUBERNETES_K8S_API_SERVER+":"+
+			string(conf.KUBERNETES_K8S_APISERVER_SECURE_PORT))
 	logging.LOG.Infof("Running the command :%v\n", set_cluster_cmd.Args)
 	if err := set_cluster_cmd.Start(); nil != err {
 		logging.LOG.Fatalf(

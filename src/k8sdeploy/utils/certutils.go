@@ -3,6 +3,7 @@ package utils
 import (
 	"encoding/json"
 	"io/ioutil"
+	"k8sdeploy/conf"
 	"k8sdeploy/logging"
 	"os"
 	"path"
@@ -13,7 +14,6 @@ import (
 	"github.com/cloudflare/cfssl/csr"
 	"github.com/cloudflare/cfssl/initca"
 	"github.com/cloudflare/cfssl/signer"
-	"github.com/spf13/viper"
 )
 
 type outputFile struct {
@@ -114,8 +114,8 @@ func generate_ca_files(ca_name string, template_path string,
 }
 
 func CreateCert() error {
-	template_path := viper.GetString("cfs.templates")
-	output_path := viper.GetString("cfs.output")
+	template_path := conf.CA_TEMPLATE_PATH
+	output_path := conf.CA_OUTPUT
 	err := generate_ca_files("ca", template_path, output_path, nil)
 	if nil != err {
 		logging.LOG.Errorf("Fail to generate the CA files:%v\n", err)

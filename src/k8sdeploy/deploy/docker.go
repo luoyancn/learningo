@@ -1,12 +1,12 @@
 package deploy
 
 import (
+	"k8sdeploy/conf"
 	"k8sdeploy/logging"
 	"k8sdeploy/utils"
 	"os"
+	"path/filepath"
 	"text/template"
-
-	"github.com/spf13/viper"
 )
 
 func DeployDocker(k8snodeips ...string) bool {
@@ -15,12 +15,12 @@ func DeployDocker(k8snodeips ...string) bool {
 			return a - b
 		},
 	}
-	ctx := template.Must(template.New("docker.service.template").Funcs(
-		funcMap).ParseFiles(viper.GetString("docker.template")))
-	insecure_registrys := viper.GetStringSlice("docker.insecure_registrys")
+	_, template_name := filepath.Split(conf.DOCKER_TEMPLATE)
+	ctx := template.Must(template.New(template_name).Funcs(
+		funcMap).ParseFiles(conf.DOCKER_TEMPLATE))
 	map_ctx := map[string]interface{}{
-		"docker_hub_mirror":  viper.GetString("docker.docker_hub_mirror"),
-		"insecure_registrys": insecure_registrys}
+		"docker_hub_mirror":  conf.DOCKER_HUB_MIRROR,
+		"insecure_registrys": conf.DOCKER_INSECURE_REGISTRYS}
 	writer, err := os.Create("/tmp/docker.service")
 	if nil != err {
 		logging.LOG.Errorf(

@@ -1,35 +1,76 @@
 [default]
 # Log operations with debug level.Default is false
 #debug = false
+
 # The full path of log file
-# log_file = "k8sdeploy.log"
+log_file = "/var/log/k8sdeploy.log"
 
 [kubernetes]
-target_path = "/usr/bin"
+# The k8s binary path on target server. Default is /usr/local/bin
+#k8s_bin_path = "/usr/local/bin"
 
-nodes = {k8snode1="192.168.142.18", k8snode2="192.168.142.19",k8snode3="192.168.142.21"}
-binary_path = "/home/zhangjl/kubernetes/kubernetes"
-overwrite_binary = false
-overwrite_ssl = true
+# The k8s node ip mapping of k8s clusters. Default is empty.
+# Please ensure this configed in follows.
+k8s_nodes = {k8snode1="192.168.142.18", k8snode2="192.168.142.19",k8snode3="192.168.142.21"}
 
-config_path = "/etc/kubernetes"
-ssl_config_path = "/etc/kubernetes/ssl"
+# The path of k8s binary files. Default is empty.
+# Please ensure this configed in follows.
+k8s_binary = "/home/zhangjl/kubernetes/kubernetes"
+
+# Overwrite the binary files of k8s. Default is false
+#k8s_overwrite_binary = false
+
+# Overwrite the config files of k8s. Default is true
+#k8s_overwrite_file = true
+
+# The config file path of k8s on dest servers. Default is /etc/kubernetes
+#k8s_config_path = "/etc/kubernetes"
+
+# The ssl pem file path of k8s on dest servers. Default is /etc/kubernetes/ssl
+#k8s_ssl_config_path = "/etc/kubernetes/ssl"
+
+# The name of kubernetes cluster. Default is kubernetes
+#k8s_cluster_name = "kubernetes"
+
+# The ip address or domain name of kubernetes. Default is empty
+# Please ensure this configed in follows.
+k8s_api_server = "20.30.40.10"
+
+# The secure port of api server. Default is 6443
+#k8s_apiserver_secure_port = 6443
+
+# The insecure port of api server. Default is 8080
+#k8s_apiserver_insecure_port = 8080
+
+# The runtime config of api server. Default is rbac.authorization.k8s.io/v1beta1
+#k8s_apiserver_runtime_config = "rbac.authorization.k8s.io/v1beta1"
+
+# The ip range of k8s service. Default is 10.20.0.0/16
+#k8s_cluster_service_ip_cidr = "10.20.0.0/16"
+
+# The service node port range. Default is 30000-32767
+#k8s_service_node_port_range = "30000-32767"
+
+# The ip range of k8s pod. Default is 10.10.0.0/16
+#k8s_cluster_pod_ip_cidr =  "10.10.0.0/16"
+
+# The port of controller manager. Default is 10252
+#k8s_controller_manager_port = 10252
+
+# The port of scheduler. Default is 10251
+#k8s_scheduler_port = 10251
+
+# The template file of api server. Default is empty
+k8s_api_server_template = "/opt/github.com/learningo/templates/kube-apiserver.service.template"
+
+# The template file of controller. Default is empty
+k8s_controller_template = "/opt/github.com/learningo/templates/kube-controller-manager.service.template"
+
+# The template file of scheduler. Default is empty
+k8s_scheduler_template = "/opt/github.com/learningo/templates/kube-scheduler.service.template"
 
 kubelet_workdir = "/var/lib/kubelet"
 
-cluster_name = "kubernetes"
-apiserver_runtime_config = "rbac.authorization.k8s.io/v1beta1"
-apiserver_secure_port = 6443
-apiserver_insecure_port = 8080
-cluster_service_ip_cidr = "10.20.0.0/16"
-service_node_port_range = "30000-32767"
-cluster_pod_ip_cidr =  "10.10.0.0/16"
-controller_manager_port = 10252
-scheduler_port = 10251
-
-api_insecure_port = 8080
-api_secure_port = 6443
-api_server = "20.30.40.10"
 
 kube_cadvisor_port = 4194
 kube_cluster_dns_svc_ip = "10.20.0.2"
@@ -39,44 +80,74 @@ kube_pod_infra_image = "gcr.io/google_containers/pause:3.0"
 kubelet_port = 10250
 kubelet_readonly_port = 10255
 
-api_server_template = "/opt/github.com/learningo/templates/kube-apiserver.service.template"
-controller_template = "/opt/github.com/learningo/templates/kube-controller-manager.service.template"
-scheduler_template = "/opt/github.com/learningo/templates/kube-scheduler.service.template"
-
 [ca]
 # The path to store the ca json info files
 template_path = "/opt/github.com/learningo/initca"
+
 # The path to store the ca pem and key files
 output = "/opt/github.com/learningo/ca"
+
 # Overwrite the ca pem files. Default is true.
 #overwrite = true
 
 [etcd]
-# The template file for etcd config file
-template = "etcd.conf.template"
-# The etcd servers, hostname and ip mapping
+# The template file for etcd config file. Default is empty.
+# Please ensure this configed in follows.
+template = "/opt/github.com/learningo/templates/etcd.conf.template"
+
+# The etcd servers, hostname and ip mapping. Default is empty.
+# Please ensure this configed in follows.
 nodes = {k8snode1="20.30.40.10", k8snode2="20.30.40.4",k8snode3="20.30.40.8"}
+
 # Overwrite the etcd config file. Default is true.
 #overwrite = true
 
+# The protocal used in etcd. Default is https.
+# While, only https support now.
+#protocal = "https"
+
+# The token of etcd. Default is k8s-cluster-token
+#token = "k8s-cluster-token"
+
+# SSL auth for etcd client auth. Default is true.
+# protocal not equal https, this should be false.
+#client_cert_auth = true
+
+# SSL auth for etcd peer auth. Default is true.
+# protocal not equal https, this should be false.
+#peer_cert_auth = true
+
+# The ca pem file path for etcd. Default is /etc/etcd/ssl
+#etcd_ssl = "/etc/etcd/ssl"
+
+# Debug for etcd. Default is true
+#etcd_debug = true
+
 [docker]
-# The template file of docker service
+# The template file of docker service.
 template = "/opt/github.com/learningo/templates/docker.service.template"
+
 # Docker hub mirror
 #docker_hub_mirror = "https://docker.mirrors.ustc.edu.cn"
+
 # The insecure registry of docker, Default is []
 #insecure_registrys = []
+
 # Overwrite the docker service file. Default is true.
 #overwrite = true
 
 [calico]
 # The path of calicoctl on target host.Default is /usr/local/bin
 #cni_bin_path = "/usr/local/bin"
+
 # The path of calico config file.Default is /etc/cni/net.d
 #cni_conf_path = "/etc/cni/net.d"
+
 # The binary path of calico
 cni_binary= "/home/zhangjl/kubernetes/calico"
+
 # Overwrite the calico binary file. Default is false.
 #overwrite_binary = false
+
 # Overwrite the calico config file. Default is true.
 #overwrite_file = true
