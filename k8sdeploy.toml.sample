@@ -7,7 +7,7 @@ log_file = "/var/log/k8sdeploy.log"
 
 [kubernetes]
 # The k8s binary path on target server. Default is /usr/local/bin
-#k8s_bin_path = "/usr/local/bin"
+k8s_bin_path = "/usr/bin"
 
 # The k8s node ip mapping of k8s clusters. Default is empty.
 # Please ensure this configed in follows.
@@ -69,16 +69,31 @@ k8s_controller_template = "/opt/github.com/learningo/templates/kube-controller-m
 # The template file of scheduler. Default is empty
 k8s_scheduler_template = "/opt/github.com/learningo/templates/kube-scheduler.service.template"
 
-kubelet_workdir = "/var/lib/kubelet"
+#k8s_kubelet_workdir = "/var/lib/kubelet"
 
+# The template file of kubelet. Default is empty
+k8s_kubelet_template = "/opt/github.com/learningo/templates/kubelet.service.template"
 
-kube_cadvisor_port = 4194
-kube_cluster_dns_svc_ip = "10.20.0.2"
-kube_dns_domain = "k8s.zhangjl.me"
-kubelet_healthz_port = 10248
-kube_pod_infra_image = "gcr.io/google_containers/pause:3.0"
-kubelet_port = 10250
-kubelet_readonly_port = 10255
+# The cadvisor port for kubernetes. Default is 4194
+#kube_cadvisor_port = 4194
+
+# The cluster dns ip. Default is 10.20.0.2
+#kube_cluster_dns_svc_ip = "10.20.0.2"
+
+# The dns domain for kubernetes. Default is k8s.zhangjl.me
+#kube_dns_domain = "k8s.zhangjl.me"
+
+# The health check port of kubernetes. Default is 10248
+#kubelet_healthz_port = 10248
+
+# The infra image for kubernetes. Default is gcr.io/google_containers/pause:3.0
+#kube_pod_infra_image = "gcr.io/google_containers/pause:3.0"
+
+# The kubelet port. Default is 10250
+#kubelet_port = 10250
+
+# The readonly port of kubelete. Default is 10255
+#kubelet_readonly_port = 10255
 
 [ca]
 # The path to store the ca json info files
@@ -128,7 +143,7 @@ nodes = {k8snode1="20.30.40.10", k8snode2="20.30.40.4",k8snode3="20.30.40.8"}
 template = "/opt/github.com/learningo/templates/docker.service.template"
 
 # Docker hub mirror
-#docker_hub_mirror = "https://docker.mirrors.ustc.edu.cn"
+docker_hub_mirror = "https://docker.mirrors.ustc.edu.cn"
 
 # The insecure registry of docker, Default is []
 #insecure_registrys = []

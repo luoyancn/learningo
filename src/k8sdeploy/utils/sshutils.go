@@ -2,13 +2,14 @@ package utils
 
 import (
 	"io/ioutil"
+	"k8sdeploy/conf"
 	"k8sdeploy/logging"
 	"os"
 	"path"
 	"path/filepath"
 	"runtime"
+	"strconv"
 	"strings"
-	"time"
 
 	"github.com/pkg/sftp"
 	"golang.org/x/crypto/ssh"
@@ -36,15 +37,15 @@ func GenerateSshAuthConfig() *ssh.ClientConfig {
 			parsePublicKeyFile("/root/.ssh/id_rsa"),
 		},
 		HostKeyCallback: ssh.InsecureIgnoreHostKey(),
-		Timeout:         5 * time.Second,
+		Timeout:         conf.SSH_TIMEOUT,
 	}
 	return ssh_config_with_key
 }
 
 func GetSshConnection(host string,
 	ssh_key *ssh.ClientConfig) (*ssh.Client, error) {
-	conn, err := ssh.Dial(
-		"tcp", strings.Join([]string{host, "22"}, ":"), ssh_key)
+	conn, err := ssh.Dial("tcp", strings.Join([]string{host,
+		strconv.Itoa(conf.SSH_PORT)}, ":"), ssh_key)
 	if nil != err {
 		return nil, err
 	}
@@ -232,12 +233,12 @@ func SCPFiles(source_path []string, dest_path string,
 			if !scp_source_to_dest(ssh_conn, file_type, dest_path,
 				overwrite, files...) {
 				logging.LOG.Errorf(
-					"Fail to scp the files to %s\n", node)
+					"Fail to scp the files %v to %s\n", files, node)
 				ssh_res <- false
 				return
 			}
 			logging.LOG.Infof(
-				"Scp files to host %s success \n", node)
+				"Scp files %v to host %s success \n", files, node)
 			ssh_res <- true
 		}(node)
 	}

@@ -1,10 +1,16 @@
 package conf
 
+import (
+	"time"
+)
+
 var (
 
 	// Global [defalut] configurations
-	DEBUG   = false
-	LOGFILE = "k8sdeploy.log"
+	DEBUG       = false
+	LOGFILE     = "k8sdeploy.log"
+	SSH_PORT    = 22
+	SSH_TIMEOUT = 5 * time.Second
 
 	// Ca configurations in [ca] section
 	CA_TEMPLATE_PATH = ""
@@ -28,18 +34,25 @@ var (
 	KUBERNETES_K8S_CONFIG_PATH              = "/etc/kubernetes"
 	KUBERNETES_K8S_CLUSTER_NAME             = "kubernetes"
 	KUBERNETES_K8S_API_SERVER               = ""
-	KUBERNETES_K8S_APISERVER_SECURE_PORT    = 6443
+	KUBERNETES_K8S_APISERVER_SECURE_PORT    = 5443
 	KUBERNETES_K8S_API_SERVER_TEMPLATE      = ""
 	KUBERNETES_K8S_CONTROLLER_TEMPLATE      = ""
 	KUBERNETES_K8S_SCHEDULER_TEMPLATE       = ""
 	KUBERNETES_K8S_CLUSTER_SERVICE_IP_CIDR  = "10.20.0.0/16"
-	KUBERNETES_K8S_APISERVER_INSECURE_PORT  = 8080
+	KUBERNETES_K8S_APISERVER_INSECURE_PORT  = 7070
 	KUBERNETES_K8S_APISERVER_RUNTIME_CONFIG = "rbac.authorization.k8s.io/v1beta1"
 	KUBERNETES_K8S_SERVICE_NODE_PORT_RANGE  = "30000-32767"
 	KUBERNETES_K8S_CLUSTER_POD_IP_CIDR      = "10.10.0.0/16"
 	KUBERNETES_K8S_CONTROLLER_MANAGER_PORT  = 10252
 	KUBERNETES_K8S_SCHEDULER_PORT           = 10251
-
+	KUBERNETES_KUBELET_TEMPLATE             = ""
+	KUBERNETES_KUBE_CADVISOR_PORT           = 4194
+	KUBERNETES_KUBE_CLUSTER_DNS_SVC_IP      = "10.20.0.2"
+	KUBERNETES_KUBE_DNS_DOMAIN              = "k8s.zhangjl.me"
+	KUBERNETES_KUBELET_HEALTHZ_PORT         = 10248
+	KUBERNETES_KUBE_POD_INFRA_IMAGE         = "gcr.io/google_containers/pause:3.0"
+	KUBERNETES_KUBELET_PORT                 = 10250
+	KUBERNETES_KUBELET_READONLY_PORT        = 10255
 	// Ectd configurations in [etcd] section
 	// And, etcd server always means kubernetes nodes, but etcd use private
 	// ip address

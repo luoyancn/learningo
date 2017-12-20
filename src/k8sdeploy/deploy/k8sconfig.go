@@ -9,6 +9,7 @@ import (
 	"os/exec"
 	"path/filepath"
 	"runtime"
+	"strconv"
 	"strings"
 	"time"
 )
@@ -34,7 +35,11 @@ func generate_token_csv(k8snodes ...string) (bool, string) {
 		"", true, k8snodes...), bootstrap_token
 }
 
-func GenerateK8sConfig(k8snodes ...string) bool {
+func GenerateK8sConfig() bool {
+	k8snodes := []string{}
+	for _, node := range conf.KUBERNETES_K8S_NODES {
+		k8snodes = append(k8snodes, node)
+	}
 	ok, bootstrap_token := generate_token_csv(k8snodes...)
 	if !ok {
 		return false
@@ -55,7 +60,7 @@ func GenerateK8sConfig(k8snodes ...string) bool {
 	set_cluster_cmd := exec.Command(kubectl_cmd, "config", "set-cluster",
 		cluster_name, "--embed-certs=true",
 		"--server=https://"+conf.KUBERNETES_K8S_API_SERVER+":"+
-			string(conf.KUBERNETES_K8S_APISERVER_SECURE_PORT),
+			strconv.Itoa(conf.KUBERNETES_K8S_APISERVER_SECURE_PORT),
 		"--certificate-authority="+ca_pem, kubeconfig)
 	logging.LOG.Infof("Running the command :%v\n", set_cluster_cmd.Args)
 	if err := set_cluster_cmd.Start(); nil != err {
@@ -64,8 +69,9 @@ func GenerateK8sConfig(k8snodes ...string) bool {
 		return false
 	}
 
+	time.Sleep(5 * time.Millisecond)
 	set_credentials_cmd := exec.Command(
-		kubectl_cmd, "config", "set-credentials",
+		kubectl_cmd, "config", "set-credentials", "kubelet-bootstrap",
 		"--token="+bootstrap_token, kubeconfig)
 	logging.LOG.Infof("Running the command :%v\n", set_credentials_cmd.Args)
 	if err := set_credentials_cmd.Start(); nil != err {
@@ -74,8 +80,9 @@ func GenerateK8sConfig(k8snodes ...string) bool {
 		return false
 	}
 
+	time.Sleep(5 * time.Millisecond)
 	set_context_cmd := exec.Command(
-		kubectl_cmd, "config", "set-context",
+		kubectl_cmd, "config", "set-context", "default",
 		"--cluster="+cluster_name, "--user=kubelet-bootstrap", kubeconfig)
 	logging.LOG.Infof("Running the command :%v\n", set_context_cmd.Args)
 	if err := set_context_cmd.Start(); nil != err {
@@ -84,9 +91,9 @@ func GenerateK8sConfig(k8snodes ...string) bool {
 		return false
 	}
 
+	time.Sleep(1 * time.Second)
 	use_context_cmd := exec.Command(
-		kubectl_cmd, "config", "use-context", "default",
-		"--cluster="+cluster_name, "--user=kubelet-bootstrap", kubeconfig)
+		kubectl_cmd, "config", "use-context", "default", kubeconfig)
 	logging.LOG.Infof("Running the command :%v\n", use_context_cmd.Args)
 	if err := use_context_cmd.Start(); nil != err {
 		logging.LOG.Fatalf(
@@ -94,11 +101,12 @@ func GenerateK8sConfig(k8snodes ...string) bool {
 		return false
 	}
 
+	time.Sleep(1 * time.Second)
 	set_proxy_cluster_cmd := exec.Command(
 		kubectl_cmd, "config", "set-cluster", cluster_name,
 		"--embed-certs=true", "--server=https://"+
 			conf.KUBERNETES_K8S_API_SERVER+
-			":"+string(conf.KUBERNETES_K8S_APISERVER_SECURE_PORT),
+			":"+strconv.Itoa(conf.KUBERNETES_K8S_APISERVER_SECURE_PORT),
 		"--certificate-authority="+ca_pem, kubeproxyconfig)
 	logging.LOG.Infof("Running the command :%v\n", set_proxy_cluster_cmd.Args)
 	if err := set_proxy_cluster_cmd.Start(); nil != err {
@@ -107,6 +115,7 @@ func GenerateK8sConfig(k8snodes ...string) bool {
 		return false
 	}
 
+	time.Sleep(5 * time.Millisecond)
 	set_proxy_cred_cmd := exec.Command(
 		kubectl_cmd, "config", "set-credentials", "kube-proxy",
 		"--embed-certs=true", "--client-certificate="+kube_proxy_pem,
@@ -118,6 +127,7 @@ func GenerateK8sConfig(k8snodes ...string) bool {
 		return false
 	}
 
+	time.Sleep(5 * time.Millisecond)
 	set_proxy_context_cmd := exec.Command(
 		kubectl_cmd, "config", "set-context", "default",
 		"--cluster="+cluster_name, "--user=kube-proxy", kubeproxyconfig)
@@ -128,6 +138,7 @@ func GenerateK8sConfig(k8snodes ...string) bool {
 		return false
 	}
 
+	time.Sleep(5 * time.Millisecond)
 	use_proxy_context_cmd := exec.Command(
 		kubectl_cmd, "config", "use-context", "default", kubeproxyconfig)
 	logging.LOG.Infof("Running the command :%v\n", use_proxy_context_cmd.Args)
@@ -136,13 +147,14 @@ func GenerateK8sConfig(k8snodes ...string) bool {
 			"Failed to switch kubeproxy cluster context:%v\n", err)
 		return false
 	}
+	time.Sleep(5 * time.Millisecond)
 
 	runtime.GOMAXPROCS(2)
 	create_channel := make(chan struct{}, 2)
 
 	for _, f := range []string{kube_file, kube_proxy} {
 		go func(f string) {
-			ticker := time.NewTicker(time.Millisecond * 10)
+			ticker := time.NewTicker(time.Millisecond * 100)
 			defer ticker.Stop()
 			for _ = range ticker.C {
 				if _, err := os.Stat(f); nil != err {
@@ -160,7 +172,6 @@ func GenerateK8sConfig(k8snodes ...string) bool {
 	for i := 0; i < 2; i++ {
 		<-create_channel
 	}
-
 	return utils.SCPFiles(
 		[]string{kube_file, kube_proxy},
 		conf.KUBERNETES_K8S_CONFIG_PATH, "", true, k8snodes...)

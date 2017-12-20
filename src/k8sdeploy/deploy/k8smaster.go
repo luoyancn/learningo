@@ -5,13 +5,14 @@ import (
 	"k8sdeploy/logging"
 	"k8sdeploy/utils"
 	"os"
+	"strconv"
 	"strings"
 	"text/template"
 )
 
-func Deployk8sMaster(k8snodes map[string]string) bool {
+func Deployk8sMaster() bool {
 	ips := []string{}
-	for _, ip := range k8snodes {
+	for _, ip := range conf.KUBERNETES_K8S_NODES {
 		ips = append(ips, ip)
 	}
 	k8sapis := conf.ETCD_NODES
@@ -40,7 +41,7 @@ func Deployk8sMaster(k8snodes map[string]string) bool {
 		"service_node_port_range":  conf.KUBERNETES_K8S_SERVICE_NODE_PORT_RANGE}
 
 	insecure_apiserver := "http://" + conf.KUBERNETES_K8S_API_SERVER +
-		":" + string(conf.KUBERNETES_K8S_APISERVER_INSECURE_PORT)
+		":" + strconv.Itoa(conf.KUBERNETES_K8S_APISERVER_INSECURE_PORT)
 	controller_map := map[string]interface{}{
 		"cluster_pod_ip_cidr":     conf.KUBERNETES_K8S_CLUSTER_POD_IP_CIDR,
 		"cluster_service_ip_cidr": cluster_service_ip_cidr,
@@ -95,7 +96,7 @@ func Deployk8sMaster(k8snodes map[string]string) bool {
 		}
 		if !utils.SCPFiles([]string{api_writer.Name()},
 			"/usr/lib/systemd/system/kube-apiserver.service",
-			"file", true, k8snodes[node]) {
+			"file", true, conf.KUBERNETES_K8S_NODES[node]) {
 			return false
 		}
 	}

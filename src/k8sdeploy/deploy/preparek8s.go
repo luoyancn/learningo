@@ -5,7 +5,11 @@ import (
 	"k8sdeploy/utils"
 )
 
-func PrepareK8SBinary(nodes ...string) bool {
+func PrepareK8SBinary() bool {
+	nodes := []string{}
+	for _, node := range conf.KUBERNETES_K8S_NODES {
+		nodes = append(nodes, node)
+	}
 	binary_files_path := conf.KUBERNETES_K8S_BINARY
 	dest_binary_path := conf.KUBERNETES_K8S_BIN_PATH
 	overwrite_k8s_binary := conf.KUBERNETES_K8S_OVERWRITE_BINARY
@@ -13,7 +17,11 @@ func PrepareK8SBinary(nodes ...string) bool {
 		dest_binary_path, "binary", overwrite_k8s_binary, nodes...)
 }
 
-func PrepareCAKey(nodes ...string) bool {
+func PrepareCAKey() bool {
+	nodes := []string{}
+	for _, node := range conf.KUBERNETES_K8S_NODES {
+		nodes = append(nodes, node)
+	}
 	source_json_path := conf.CA_TEMPLATE_PATH
 	source_ca_path := conf.CA_OUTPUT
 	dest_ca_path := conf.KUBERNETES_K8S_SSL_CONFIG_PATH

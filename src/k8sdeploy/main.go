@@ -14,9 +14,6 @@ import (
 
 var once sync.Once
 var configfile string
-var k8snode_map_ip map[string]string
-var k8snodes []string
-var k8snodeips []string
 
 var rootcmd = &cobra.Command{
 	Short: "Tools for deploy kubernetes clusters",
@@ -134,6 +131,36 @@ func preparenv(cmd *cobra.Command, args []string) {
 		logging.LOG.Criticalf(msg)
 		os.Exit(-1)
 	}
+	if "" == conf.KUBERNETES_K8S_API_SERVER {
+		msg := "Please tell me where were your k8s binarys" +
+			" in [kubernetes] section with k8s_binary\n"
+		logging.LOG.Criticalf(msg)
+		os.Exit(-1)
+	}
+	if "" == conf.KUBERNETES_K8S_API_SERVER_TEMPLATE {
+		msg := "Please tell me where were your api server template" +
+			" in [kubernetes] section with k8s_api_server_template\n"
+		logging.LOG.Criticalf(msg)
+		os.Exit(-1)
+	}
+	if "" == conf.KUBERNETES_K8S_CONTROLLER_TEMPLATE {
+		msg := "Please tell me where were your controller template file" +
+			" in [kubernetes] section with k8s_controller_template\n"
+		logging.LOG.Criticalf(msg)
+		os.Exit(-1)
+	}
+	if "" == conf.KUBERNETES_K8S_SCHEDULER_TEMPLATE {
+		msg := "Please tell me where were your schduler template file" +
+			" in [kubernetes] section with k8s_scheduler_template\n"
+		logging.LOG.Criticalf(msg)
+		os.Exit(-1)
+	}
+	if "" == conf.KUBERNETES_KUBELET_TEMPLATE {
+		msg := "Please tell me where were your kubelet template file" +
+			" in [kubernetes] section with kubelet_template\n"
+		logging.LOG.Criticalf(msg)
+		os.Exit(-1)
+	}
 
 	// Check the required configurations in [ca] section
 	if "" == conf.CA_TEMPLATE_PATH {
@@ -150,7 +177,7 @@ func preparenv(cmd *cobra.Command, args []string) {
 	}
 	if "" == conf.CA_OUTPUT {
 		msg := "Please tell me where to put your generated ca files" +
-			" files in [ca] section with output\n"
+			" in [ca] section with output\n"
 		logging.LOG.Criticalf(msg)
 		os.Exit(-1)
 	}
@@ -164,33 +191,61 @@ func preparenv(cmd *cobra.Command, args []string) {
 			os.Exit(-1)
 		}
 	}
+
+	// Check the required configurations in [etcd] section
+	if "" == conf.ETCD_TEMPLATE {
+		msg := "Please tell me where your etcd template file" +
+			" in [etcd] section with template\n"
+		logging.LOG.Criticalf(msg)
+		os.Exit(-1)
+	}
+	if 0 == len(conf.ETCD_NODES) {
+		msg := "Please tell me your etcd servers" +
+			" in [etcd] section with nodes\n"
+		logging.LOG.Criticalf(msg)
+		os.Exit(-1)
+	}
+
+	// Check the required configurations in [docker] section
+	if "" == conf.DOCKER_TEMPLATE {
+		msg := "Please tell me where your docker template file" +
+			" in [docker] section with template\n"
+		logging.LOG.Criticalf(msg)
+		os.Exit(-1)
+	}
+
+	// Check the required configurations in [calico] section
+	if 0 == len(conf.CALICO_CNI_BINARY) {
+		msg := "Please tell me your calico binary files" +
+			" in [calico] section with cni_binary\n"
+		logging.LOG.Criticalf(msg)
+		os.Exit(-1)
+	}
 }
 
 func initk8senv(cmd *cobra.Command, args []string) {
-	if !deploy.PrepareK8SBinary(k8snodeips...) {
+	if !deploy.PrepareK8SBinary() {
 		logging.LOG.Criticalf(
 			"Failed to prepare k8s binary files on all k8snodes\n")
 		os.Exit(-1)
 	}
-
 	if err := deploy.CreateCA(); nil != err {
 		logging.LOG.Criticalf(
 			"Failed to create CA files for k8snodes:%v\n", err)
 		os.Exit(-1)
 	}
-
-	if !deploy.PrepareCAKey(k8snodeips...) {
+	if !deploy.PrepareCAKey() {
 		logging.LOG.Critical(
 			"Failed to prepare ca-key files on all k8snodes\n")
 		os.Exit(-1)
 	}
-	if !deploy.GenerateK8sCtx(k8snodeips...) {
+	if !deploy.GenerateK8sCtx() {
 		logging.LOG.Critical(
 			"Failed to generate the kubernetes context on all k8snodes\n")
 		os.Exit(-1)
 	}
 
-	if !deploy.GenerateK8sConfig(k8snodeips...) {
+	if !deploy.GenerateK8sConfig() {
 		logging.LOG.Critical(
 			"Failed to generate the kubernetes config file on all k8snodes\n")
 		os.Exit(-1)
@@ -198,7 +253,7 @@ func initk8senv(cmd *cobra.Command, args []string) {
 }
 
 func initetcd(cmd *cobra.Command, args []string) {
-	if !deploy.DeployEtcd(k8snode_map_ip) {
+	if !deploy.DeployEtcd() {
 		logging.LOG.Critical(
 			"Failed to deploy or init etcd cluster on all k8snodes\n")
 		os.Exit(-1)
@@ -206,7 +261,7 @@ func initetcd(cmd *cobra.Command, args []string) {
 }
 
 func initdocker(cmd *cobra.Command, args []string) {
-	if !deploy.DeployDocker(k8snodeips...) {
+	if !deploy.DeployDocker() {
 		logging.LOG.Critical(
 			"Failed to generate the docker service config file on all k8snodes\n")
 		os.Exit(-1)
@@ -214,7 +269,7 @@ func initdocker(cmd *cobra.Command, args []string) {
 }
 
 func initk8smaster(cmd *cobra.Command, args []string) {
-	deploy.Deployk8sMaster(k8snode_map_ip)
+	deploy.Deployk8sMaster()
 }
 
 func initk8snode(cmd *cobra.Command, args []string) {

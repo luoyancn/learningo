@@ -2,6 +2,7 @@ package conf
 
 import (
 	"sync"
+	"time"
 
 	"github.com/spf13/viper"
 )
@@ -34,11 +35,15 @@ func OverWriteConf() {
 func set_default_section() {
 	viper.SetDefault("default.debug", false)
 	viper.SetDefault("default.log_file", "k8sdeploy.log")
+	viper.SetDefault("default.ssh_port", 22)
+	viper.SetDefault("default.ssh_timeout", 5*time.Second)
 }
 
 func over_write_default_section() {
 	DEBUG = viper.GetBool("default.debug")
 	LOGFILE = viper.GetString("default.log_file")
+	SSH_PORT = viper.GetInt("default.ssh_port")
+	SSH_TIMEOUT = viper.GetDuration("default.ssh_timeout")
 }
 
 func set_kubernetes_section() {
@@ -51,12 +56,11 @@ func set_kubernetes_section() {
 	viper.SetDefault("kubernetes.k8s_config_path", "/etc/kubernetes")
 	viper.SetDefault("kubernetes.k8s_cluster_name", "kubernetes")
 	viper.SetDefault("kubernetes.k8s_api_server", "")
-	viper.SetDefault("kubernetes.k8s_apiserver_secure_port", 6443)
+	viper.SetDefault("kubernetes.k8s_apiserver_secure_port", 5443)
 	viper.SetDefault("kubernetes.k8s_api_server_template", "")
 	viper.SetDefault("kubernetes.k8s_controller_template", "")
 	viper.SetDefault("kubernetes.k8s_scheduler_template", "")
-	viper.SetDefault("kubernetes.k8s_cluster_service_ip_cidr", "10.20.0.0/16")
-	viper.SetDefault("kubernetes.k8s_apiserver_insecure_port", 8080)
+	viper.SetDefault("kubernetes.k8s_apiserver_insecure_port", 7070)
 	viper.SetDefault("kubernetes.k8s_apiserver_runtime_config",
 		"rbac.authorization.k8s.io/v1beta1")
 	viper.SetDefault("kubernetes.k8s_cluster_service_ip_cidr", "10.20.0.0/16")
@@ -64,6 +68,15 @@ func set_kubernetes_section() {
 	viper.SetDefault("kubernetes.k8s_cluster_pod_ip_cidr", "10.10.0.0/16")
 	viper.SetDefault("kubernetes.k8s_controller_manager_port", 10252)
 	viper.SetDefault("kubernetes.k8s_scheduler_port", 10251)
+	viper.SetDefault("kubernetes.kubelete_template", "")
+	viper.SetDefault("kubernetes.kube_cadvisor_port", 4194)
+	viper.SetDefault("kubernetes.kube_cluster_dns_svc_ip", "10.20.0.2")
+	viper.SetDefault("kubernetes.kube_dns_domain", "k8s.zhangjl.me")
+	viper.SetDefault("kubernetes.kubelet_healthz_port", 10248)
+	viper.SetDefault("kubernetes.kube_pod_infra_image",
+		"gcr.io/google_containers/pause:3.0")
+	viper.SetDefault("kubernetes.kubelet_port", 10250)
+	viper.SetDefault("kubernetes.kubelet_readonly_port", 10255)
 }
 
 func over_write_kubernetes_section() {
@@ -103,6 +116,20 @@ func over_write_kubernetes_section() {
 		"kubernetes.k8s_controller_manager_port")
 	KUBERNETES_K8S_SCHEDULER_PORT = viper.GetInt(
 		"kubernetes.k8s_scheduler_port")
+	KUBERNETES_KUBELET_TEMPLATE = viper.GetString(
+		"kubernetes.kubelet_template")
+	KUBERNETES_KUBE_CADVISOR_PORT = viper.GetInt(
+		"kubernetes.kube_cadvisor_port")
+	KUBERNETES_KUBE_CLUSTER_DNS_SVC_IP = viper.GetString(
+		"kubernetes.kube_cluster_dns_svc_ip")
+	KUBERNETES_KUBE_DNS_DOMAIN = viper.GetString("kubernetes.kube_dns_domain")
+	KUBERNETES_KUBELET_HEALTHZ_PORT = viper.GetInt(
+		"kubernetes.kubelet_healthz_port")
+	KUBERNETES_KUBE_POD_INFRA_IMAGE = viper.GetString(
+		"kubernetes.kube_pod_infra_image")
+	KUBERNETES_KUBELET_PORT = viper.GetInt("kubernetes.kubelet_port")
+	KUBERNETES_KUBELET_READONLY_PORT = viper.GetInt(
+		"kubernetes.kubelet_readonly_port")
 }
 
 func set_etcd_section() {
