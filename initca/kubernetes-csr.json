@@ -1,13 +1,17 @@
 {
     "CN": "kubernetes",
     "hosts": [
+        "10.20.0.1",
         "20.30.40.4",
         "20.30.40.8",
         "20.30.40.10",
         "127.0.0.1",
         "kubernetes",
         "kubernetes.default",
-        "kubernetes.default.svc"
+        "kubernetes.default.svc",
+        "kubernetes.default.svc.k8s",
+        "kubernetes.default.svc.k8s.zhangjl",
+        "kubernetes.default.svc.k8s.zhangjl.me"
     ],
     "key": {
         "algo": "rsa",
