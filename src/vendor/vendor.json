@@ -337,6 +337,18 @@
 			"revisionTime": "2017-10-20T20:55:21Z"
 		},
 		{
+			"checksumSHA1": "gEjGS03N1eysvpQ+FCHTxPcbxXc=",
+			"path": "github.com/kardianos/osext",
+			"revision": "ae77be60afb1dcacde03767a8c37337fad28ac14",
+			"revisionTime": "2017-05-10T13:15:34Z"
+		},
+		{
+			"checksumSHA1": "JeD0XcHmFqzFNdliHaylHuxiZkI=",
+			"path": "github.com/kardianos/service",
+			"revision": "615a14ed75099c9eaac6949e22ac2341bf9d3197",
+			"revisionTime": "2018-03-20T10:02:15Z"
+		},
+		{
 			"checksumSHA1": "ss+6kcmkUGRUhwrx3RmE+C6rBhY=",
 			"path": "github.com/kisielk/sqlstruct",
 			"revision": "648daed35d49dac24a4bff253b190a80da3ab6a5",
@@ -569,6 +581,36 @@
 			"path": "golang.org/x/sys/unix",
 			"revision": "95c6576299259db960f6c5b9b69ea52422860fce",
 			"revisionTime": "2017-10-30T10:08:44Z"
+		},
+		{
+			"checksumSHA1": "Dfz4tGItokMvHZENCsBmPPB8FGQ=",
+			"path": "golang.org/x/sys/windows",
+			"revision": "ecfd8b563e1320e7282dccf28ad48ec2c68aaebf",
+			"revisionTime": "2018-04-16T21:07:26Z"
+		},
+		{
+			"checksumSHA1": "uCpbmktijfpv9WhfAH3VTHu9GKA=",
+			"path": "golang.org/x/sys/windows/registry",
+			"revision": "ecfd8b563e1320e7282dccf28ad48ec2c68aaebf",
+			"revisionTime": "2018-04-16T21:07:26Z"
+		},
+		{
+			"checksumSHA1": "VNlkHemg81Ba7ElHfKKUU1h+U1U=",
+			"path": "golang.org/x/sys/windows/svc",
+			"revision": "ecfd8b563e1320e7282dccf28ad48ec2c68aaebf",
+			"revisionTime": "2018-04-16T21:07:26Z"
+		},
+		{
+			"checksumSHA1": "uVlUSSKplihZG7N+QJ6fzDZ4Kh8=",
+			"path": "golang.org/x/sys/windows/svc/eventlog",
+			"revision": "ecfd8b563e1320e7282dccf28ad48ec2c68aaebf",
+			"revisionTime": "2018-04-16T21:07:26Z"
+		},
+		{
+			"checksumSHA1": "+OPy/ga50ikLv5w5Pf4WvBYThrQ=",
+			"path": "golang.org/x/sys/windows/svc/mgr",
+			"revision": "ecfd8b563e1320e7282dccf28ad48ec2c68aaebf",
+			"revisionTime": "2018-04-16T21:07:26Z"
 		},
 		{
 			"checksumSHA1": "ziMb9+ANGRJSSIuxYdRbA+cDRBQ=",
