@@ -1,4 +1,4 @@
-package restgo
+package cmd
 
 import (
 	_ "fastrest/conf"
