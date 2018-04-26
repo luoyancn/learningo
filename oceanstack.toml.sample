@@ -1,0 +1,21 @@
+[default]
+# Log operations with debug level. Default is false.
+# debug = false
+
+# The full path of log file. Default is /var/log/oceanstack.
+# log_path = "/var/log/oceanstack"
+
+[database]
+
+# The database connection configuration. Default is localhost.
+# connection = "golang:golang@tcp(127.0.0.1:3306)/golang?parseTime=true"
+
+# The max life time of database connection. Default is 30 minutes.
+# max_time_min = 30
+
+# The max idel connection of database. Default is 30.
+# max_idle = 30
+
+# The max open connection of database. Default is 30.
+# max_open = 30
+
