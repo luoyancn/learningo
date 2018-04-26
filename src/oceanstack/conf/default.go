@@ -11,6 +11,7 @@ var (
 	LOGPATH     = "/var/log/oceanstack"
 	SSH_PORT    = 22
 	SSH_TIMEOUT = 5 * time.Second
+	LISTEN      = "127.0.0.1:8888"
 
 	// Global [database] configurations
 	DATABASE_CONNECTION   = "golang:golang@tcp(127.0.0.1:3306)/golang?parseTime=true"

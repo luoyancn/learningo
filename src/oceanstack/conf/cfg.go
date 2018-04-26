@@ -39,6 +39,7 @@ func set_default_section() {
 	viper.SetDefault("default.log_path", "/var/log/oceanstack")
 	viper.SetDefault("default.ssh_port", 22)
 	viper.SetDefault("default.ssh_timeout", 5*time.Second)
+	viper.SetDefault("default.listen", "127.0.0.1:8888")
 }
 
 func over_write_default_section() {
@@ -46,6 +47,7 @@ func over_write_default_section() {
 	LOGPATH = viper.GetString("default.log_path")
 	SSH_PORT = viper.GetInt("default.ssh_port")
 	SSH_TIMEOUT = viper.GetDuration("default.ssh_timeout")
+	LISTEN = viper.GetString("default.listen")
 }
 
 func set_database_section() {

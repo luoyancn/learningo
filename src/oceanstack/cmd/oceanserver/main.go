@@ -3,14 +3,23 @@ package main
 import (
 	"fmt"
 	"oceanstack/common"
+	"oceanstack/conf"
+	"oceanstack/db"
+	"oceanstack/logging"
+	"oceanstack/utils"
 	"os"
+	"os/signal"
 	"sync"
+	"syscall"
 
+	"github.com/buaazp/fasthttprouter"
 	"github.com/spf13/cobra"
+	"github.com/valyala/fasthttp"
 )
 
 var once sync.Once
 var configfile string
+var router *fasthttprouter.Router
 
 var rootcmd = &cobra.Command{
 	Short: "Server of ocean stack",
@@ -32,19 +41,41 @@ var vercmd = &cobra.Command{
 	Args:  cobra.NoArgs,
 }
 
+func root(ctx *fasthttp.RequestCtx) {
+	fmt.Fprintf(ctx, "Welcome to the rest world of go !!!\n")
+}
+
 func init() {
 	once.Do(func() {
 		startcmd.PersistentFlags().StringVarP(
 			&configfile, "config-file", "c", "",
-			"The full path of config file (Required)")
+			"The full path of config file (Required, Only yaml, json and toml supported)")
 		startcmd.MarkPersistentFlagRequired("config-file")
 		rootcmd.AddCommand(startcmd)
 		rootcmd.AddCommand(vercmd)
+		router = fasthttprouter.New()
+		router.GET("/", root)
 	})
 }
 
 func serve(cmd *cobra.Command, args []string) {
-	fmt.Println("hello")
+	common.ReadConfig(configfile, "oceanserver", logging.FILE_ENABLED)
+	db.InitDbConnection()
+	logging.LOG.Infof("Ocean Server started, and listen on %s\n",
+		utils.GetTime(), conf.LISTEN)
+	go stop()
+	fasthttp.ListenAndServe(conf.LISTEN, router.Handler)
+}
+
+func stop() {
+	sig := make(chan os.Signal)
+	signal.Notify(sig, syscall.SIGHUP, syscall.SIGINT,
+		syscall.SIGTERM, syscall.SIGQUIT)
+	select {
+	case s := <-sig:
+		logging.LOG.Infof("Exit Ocean Server: Recived signal %s", s)
+		os.Exit(0)
+	}
 }
 
 func get_version(cmd *cobra.Command, args []string) {

@@ -5,6 +5,9 @@
 # The full path of log file. Default is /var/log/oceanstack.
 # log_path = "/var/log/oceanstack"
 
+# The api server bind address and port. Default is 127.0.0.1:8888
+listen = "0.0.0.0:8888"
+
 [database]
 
 # The database connection configuration. Default is localhost.
