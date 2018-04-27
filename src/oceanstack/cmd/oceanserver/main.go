@@ -6,7 +6,6 @@ import (
 	"oceanstack/conf"
 	"oceanstack/db"
 	"oceanstack/logging"
-	"oceanstack/utils"
 	"os"
 	"os/signal"
 	"sync"
@@ -42,7 +41,7 @@ var vercmd = &cobra.Command{
 }
 
 func root(ctx *fasthttp.RequestCtx) {
-	fmt.Fprintf(ctx, "Welcome to the rest world of go !!!\n")
+	fmt.Fprintf(ctx, "Welcome to the world of Ocean Stack !!!\n")
 }
 
 func init() {
@@ -61,8 +60,7 @@ func init() {
 func serve(cmd *cobra.Command, args []string) {
 	common.ReadConfig(configfile, "oceanserver", logging.FILE_ENABLED)
 	db.InitDbConnection()
-	logging.LOG.Infof("Ocean Server started, and listen on %s\n",
-		utils.GetTime(), conf.LISTEN)
+	logging.LOG.Infof("Ocean Server started, and listen on %s\n", conf.LISTEN)
 	go stop()
 	fasthttp.ListenAndServe(conf.LISTEN, router.Handler)
 }

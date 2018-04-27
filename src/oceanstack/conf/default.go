@@ -14,6 +14,12 @@ var (
 	LISTEN      = "127.0.0.1:8888"
 
 	// Global [database] configurations
+	REDIS_CONNECTION   = "golang:golang@tcp(127.0.0.1:3306)/golang?parseTime=true"
+	REDIS_MAX_TIME_MIN = 30 * time.Minute
+	REDIS_MAX_IDLE     = 30
+	REDIS_MAX_OPEN     = 30
+
+	// Global [redis] configurations
 	DATABASE_CONNECTION   = "golang:golang@tcp(127.0.0.1:3306)/golang?parseTime=true"
 	DATABASE_MAX_TIME_MIN = 30 * time.Minute
 	DATABASE_MAX_IDLE     = 30
