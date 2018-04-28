@@ -36,7 +36,9 @@ func OverWriteConf() {
 
 func set_default_section() {
 	viper.SetDefault("default.debug", false)
+	viper.SetDefault("default.verbose", false)
 	viper.SetDefault("default.log_path", "/var/log/oceanstack")
+	viper.SetDefault("default.admin_token", "ADMIN_TOKEN")
 	viper.SetDefault("default.ssh_port", 22)
 	viper.SetDefault("default.ssh_timeout", 5*time.Second)
 	viper.SetDefault("default.listen", "127.0.0.1:8888")
@@ -44,7 +46,9 @@ func set_default_section() {
 
 func over_write_default_section() {
 	DEBUG = viper.GetBool("default.debug")
+	VERBOSE = viper.GetBool("default.verbose")
 	LOGPATH = viper.GetString("default.log_path")
+	ADMIN_TOKEN = viper.GetString("default.admin_token")
 	SSH_PORT = viper.GetInt("default.ssh_port")
 	SSH_TIMEOUT = viper.GetDuration("default.ssh_timeout")
 	LISTEN = viper.GetString("default.listen")

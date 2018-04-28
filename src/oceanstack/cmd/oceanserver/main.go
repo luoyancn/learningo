@@ -1,7 +1,7 @@
 package main
 
 import (
-	"fmt"
+	"oceanstack/api"
 	"oceanstack/common"
 	"oceanstack/conf"
 	"oceanstack/db"
@@ -11,14 +11,11 @@ import (
 	"sync"
 	"syscall"
 
-	"github.com/buaazp/fasthttprouter"
 	"github.com/spf13/cobra"
-	"github.com/valyala/fasthttp"
 )
 
 var once sync.Once
 var configfile string
-var router *fasthttprouter.Router
 
 var rootcmd = &cobra.Command{
 	Short: "Server of ocean stack",
@@ -40,10 +37,6 @@ var vercmd = &cobra.Command{
 	Args:  cobra.NoArgs,
 }
 
-func root(ctx *fasthttp.RequestCtx) {
-	fmt.Fprintf(ctx, "Welcome to the world of Ocean Stack !!!\n")
-}
-
 func init() {
 	once.Do(func() {
 		startcmd.PersistentFlags().StringVarP(
@@ -52,8 +45,6 @@ func init() {
 		startcmd.MarkPersistentFlagRequired("config-file")
 		rootcmd.AddCommand(startcmd)
 		rootcmd.AddCommand(vercmd)
-		router = fasthttprouter.New()
-		router.GET("/", root)
 	})
 }
 
@@ -62,7 +53,7 @@ func serve(cmd *cobra.Command, args []string) {
 	db.InitDbConnection()
 	logging.LOG.Infof("Ocean Server started, and listen on %s\n", conf.LISTEN)
 	go stop()
-	fasthttp.ListenAndServe(conf.LISTEN, router.Handler)
+	api.Serve()
 }
 
 func stop() {
@@ -80,12 +71,12 @@ func get_version(cmd *cobra.Command, args []string) {
 	common.Versions("OceanServer")
 }
 
-func Execute() {
+func execute() {
 	if err := rootcmd.Execute(); nil != err {
 		os.Exit(1)
 	}
 }
 
 func main() {
-	Execute()
+	execute()
 }

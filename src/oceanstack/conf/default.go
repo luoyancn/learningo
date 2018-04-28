@@ -8,7 +8,9 @@ var (
 
 	// Global [defalut] configurations
 	DEBUG       = false
+	VERBOSE     = false
 	LOGPATH     = "/var/log/oceanstack"
+	ADMIN_TOKEN = "ADMIN_TOKEN"
 	SSH_PORT    = 22
 	SSH_TIMEOUT = 5 * time.Second
 	LISTEN      = "127.0.0.1:8888"

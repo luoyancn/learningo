@@ -18,7 +18,7 @@ func ReadConfig(conf_path string, logger string, logbak int) {
 	conf.OverWriteConf()
 	logging.GetLogger(logger, logbak)
 
-	if conf.DEBUG {
+	if conf.VERBOSE {
 		for key, value := range viper.AllSettings() {
 			settings := value.(map[string]interface{})
 			for setting_key, setting_value := range settings {

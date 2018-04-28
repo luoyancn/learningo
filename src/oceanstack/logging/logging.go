@@ -19,7 +19,7 @@ var format_std = gologging.MustStringFormatter(
 
 var format_file = gologging.MustStringFormatter(
 	"%{time:2006-01-02 15:04:05.999} [%{level:.8s}] " +
-		" %{shortfile} %{shortfunc} %{message}",
+		" [%{shortfile}] [%{shortfunc}] %{message}",
 )
 
 var once sync.Once
