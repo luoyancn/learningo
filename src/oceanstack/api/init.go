@@ -26,11 +26,14 @@ func init() {
 	})
 }
 
-func valite_req_body(str_body string, loader gojsonschema.JSONLoader) error {
+func valite_req_body(str_body string, loader gojsonschema.JSONLoader,
+	ctx *fasthttp.RequestCtx) error {
 	req_body := gojsonschema.NewStringLoader(str_body)
 	res, err := gojsonschema.Validate(loader, req_body)
 	if err != nil {
 		logging.LOG.Errorf("Cannot convert request body to json:%v\n", err)
+		ctx.SetStatusCode(fasthttp.StatusBadRequest)
+		fmt.Fprintf(ctx, "EEROR: %v\n", err)
 		return exceptions.NewJsonMarshallException(err.Error())
 	}
 
@@ -44,6 +47,8 @@ func valite_req_body(str_body string, loader gojsonschema.JSONLoader) error {
 		var err_msg string
 		err_msg = strings.Join(errs, "")
 		logging.LOG.Errorf("Invalid Json Request body :%v\n", err_msg)
+		ctx.SetStatusCode(fasthttp.StatusInternalServerError)
+		fmt.Fprintf(ctx, "Internal ERROR: %v\n", err_msg)
 		return exceptions.NewInvalidJsonException(err_msg)
 	}
 	return nil
