@@ -19,10 +19,13 @@ var router *fasthttprouter.Router
 
 var once_load sync.Once
 var auth_loader gojsonschema.JSONLoader
+var user_create_loader gojsonschema.JSONLoader
 
 func init() {
 	once_load.Do(func() {
 		auth_loader = gojsonschema.NewStringLoader(schemas.AUTH_JSON_SCHEMA)
+		user_create_loader = gojsonschema.NewStringLoader(
+			schemas.USER_CREATE_JSON_SCHEMA)
 	})
 }
 
@@ -47,7 +50,7 @@ func valite_req_body(str_body string, loader gojsonschema.JSONLoader,
 		var err_msg string
 		err_msg = strings.Join(errs, "")
 		logging.LOG.Errorf("Invalid Json Request body :%v\n", err_msg)
-		ctx.SetStatusCode(fasthttp.StatusInternalServerError)
+		ctx.SetStatusCode(fasthttp.StatusBadRequest)
 		fmt.Fprintf(ctx, "Internal ERROR: %v\n", err_msg)
 		return exceptions.NewInvalidJsonException(err_msg)
 	}
@@ -59,6 +62,17 @@ func init() {
 	router.GET("/", root)
 	router.POST("/auth", middleware.BuildPipeLine(
 		authentication, middleware.JsonMiddleware))
+
+	router.GET("/users", middleware.BuildPipeLine(
+		user_list, middleware.AuthMidddle))
+	router.GET("/users/:userid", middleware.BuildPipeLine(
+		user_get, middleware.AuthMidddle))
+	router.POST("/users", middleware.BuildPipeLine(
+		user_create, middleware.JsonMiddleware, middleware.AuthMidddle))
+	router.PUT("/users/:userid", middleware.BuildPipeLine(
+		user_update, middleware.JsonMiddleware, middleware.AuthMidddle))
+	router.DELETE("/users/:userid", middleware.BuildPipeLine(
+		user_delete, middleware.AuthMidddle))
 }
 
 func root(ctx *fasthttp.RequestCtx) {

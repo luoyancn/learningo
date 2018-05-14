@@ -14,6 +14,7 @@ func init() {
 	once.Do(func() {
 		set_default_section()
 		set_database_section()
+		set_redis_section()
 		set_kubernetes_section()
 		set_etcd_section()
 		set_calico_section()
@@ -26,6 +27,7 @@ func OverWriteConf() {
 	overwrite.Do(func() {
 		over_write_default_section()
 		over_write_database_section()
+		over_write_redis_section()
 		over_write_kubernetes_section()
 		over_write_etcd_section()
 		over_write_calico_section()
@@ -60,6 +62,7 @@ func set_database_section() {
 	viper.SetDefault("database.max_time_min", 30*time.Minute)
 	viper.SetDefault("database.max_idle", 30)
 	viper.SetDefault("database.max_open", 30)
+	viper.SetDefault("database.debug_mode", false)
 }
 
 func over_write_database_section() {
@@ -68,6 +71,27 @@ func over_write_database_section() {
 		"database.max_time_min") * time.Minute
 	DATABASE_MAX_IDLE = viper.GetInt("database.max_idle")
 	DATABASE_MAX_OPEN = viper.GetInt("database.max_open")
+	DATABASE_DEBUG_MODE = viper.GetBool("database.debug_mode")
+}
+
+func set_redis_section() {
+	viper.SetDefault("redis.connection", "127.0.0.1:6379")
+	viper.SetDefault("redis.max_idle", 30)
+	viper.SetDefault("redis.max_active", 30)
+	viper.SetDefault("redis.max_conn_lifetime", 10*time.Minute)
+	viper.SetDefault("redis.idle_timeout", 10*time.Minute)
+	viper.SetDefault("redis.database", 0)
+}
+
+func over_write_redis_section() {
+	REDIS_CONNECTION = "127.0.0.1:6379"
+	REDIS_MAX_IDLE = viper.GetInt("redis.max_idle")
+	REDIS_MAX_ACTIVE = viper.GetInt("redis.max_active")
+	REDIS_MAX_CONN_LIFETIME = viper.GetDuration(
+		"redis.max_conn_lifetime") * time.Minute
+	REDIS_IDLE_TIMEOUT = viper.GetDuration(
+		"redis.idle_timeout") * time.Minute
+	REDIS_DATABASE = viper.GetInt("redis.database")
 }
 
 func set_kubernetes_section() {

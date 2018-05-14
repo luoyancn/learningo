@@ -9,7 +9,11 @@
 # log_path = "/var/log/oceanstack"
 
 # The api server bind address and port. Default is 127.0.0.1:8888
-listen = "0.0.0.0:8888"
+# listen = "127.0.0.1:8888"
+
+# The global management admin token. Default is ADMIN_TOKEN.
+# Please change this params with uuid or md5 string
+# admin_token = "ADMIN_TOKEN"
 
 [database]
 
@@ -25,3 +29,25 @@ listen = "0.0.0.0:8888"
 # The max open connection of database. Default is 30.
 # max_open = 30
 
+# Debug mode for database connection and operations. Default is false.
+# debug_mode = false
+
+[redis]
+
+# The redis server addr and port listened. Default is 127.0.0.1:6379.
+# connection = "127.0.0.1:6379"
+
+# The redis max idle connection. Default is 30.
+# max_idle = 30
+
+# The max active connection of redis server. Default is 30.
+# max_active = 30
+
+# The max life time of redis connection. Default is 10 minutes.
+# max_conn_lifetime = 10
+
+# The timeout of idle connection. Default is 10 minutes.
+# idle_timeout = 10
+
+# The database of used in redis. Default is 0
+# database = 0

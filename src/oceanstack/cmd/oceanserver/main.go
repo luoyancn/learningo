@@ -5,6 +5,7 @@ import (
 	"oceanstack/common"
 	"oceanstack/conf"
 	"oceanstack/db"
+	"oceanstack/db/redisdb"
 	"oceanstack/logging"
 	"os"
 	"os/signal"
@@ -27,6 +28,7 @@ var startcmd = &cobra.Command{
 	Short: "Start Ocean server",
 	Long:  ` Start Ocean server`,
 	Run:   serve,
+	Args:  cobra.NoArgs,
 }
 
 var vercmd = &cobra.Command{
@@ -51,6 +53,7 @@ func init() {
 func serve(cmd *cobra.Command, args []string) {
 	common.ReadConfig(configfile, "oceanserver", logging.FILE_ENABLED)
 	db.InitDbConnection()
+	redisdb.InitRedisConnection()
 	logging.LOG.Infof("Ocean Server started, and listen on %s\n", conf.LISTEN)
 	go stop()
 	api.Serve()

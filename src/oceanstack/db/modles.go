@@ -12,7 +12,7 @@ type BaseFromGorm struct {
 }
 
 type Base struct {
-	Uuid string `gorm:"primary_key;type:varchar(36);not null"
+	Uuid string `gorm:"primary_key;type:varchar(36);not null;unique_index"
 				json:"uuid"`
 	CreatedAt time.Time `json:"created_at,string"`
 	UpdatedAt time.Time `json:"updated_at,string"`
@@ -22,9 +22,10 @@ type Base struct {
 type User struct {
 	Base
 	DeletedAt *time.Time `json:"deleted_at,string,omitempty"`
-	Name      string     `gorm:"type:varchar(36);not null" json:"name"`
+	Name      string     `gorm:"type:varchar(36);not null;unique" json:"name"`
 	Age       int8       `gorm:"type:tinyint(3)" json:"age"`
 	Sex       string     `gorm:"type:enum('men', 'women')" json:"sex"`
+	Password  string     `gorm:"type:varchar(255);not null" json: "password"`
 }
 
 type Users struct {
