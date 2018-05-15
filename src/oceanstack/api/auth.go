@@ -1,13 +1,13 @@
 package api
 
 import (
-	"crypto/md5"
-	"encoding/hex"
 	"encoding/json"
 	"fmt"
-	"io"
 	"oceanstack/db"
+	"oceanstack/db/redisdb"
 	"oceanstack/exceptions"
+	"oceanstack/logging"
+	"oceanstack/utils"
 
 	"github.com/valyala/fasthttp"
 )
@@ -21,10 +21,8 @@ func authentication(ctx *fasthttp.RequestCtx) {
 	var auth_map map[string]db.User
 	_ = json.Unmarshal(body, &auth_map)
 
-	md5_writer := md5.New()
-	io.WriteString(md5_writer, auth_map["auth"].Password)
-	_, err = db.UserGet(
-		auth_map["auth"].Name, hex.EncodeToString(md5_writer.Sum(nil)))
+	user_pointer, err := db.UserGet(
+		auth_map["auth"].Name, utils.Md5Crypto(auth_map["auth"].Password))
 	if nil != err {
 		switch err.(type) {
 		case exceptions.NotFoundException:
@@ -33,12 +31,23 @@ func authentication(ctx *fasthttp.RequestCtx) {
 				"Unauthorized:The request requires authentication\n")
 			return
 		case exceptions.SQLException:
-		case exceptions.JsonMarshallException:
+		case exceptions.ConnectionException:
 		case exceptions.Exception:
 			ctx.SetStatusCode(fasthttp.StatusInternalServerError)
 			fmt.Fprintf(ctx, "ERROR: %v\n", err)
 			return
 		}
 	}
+	token, err := redisdb.TokenIssue(user_pointer.Uuid)
+	if nil != err {
+		logging.LOG.Errorf("Cannot generate auth token:%v\n", err)
+		ctx.SetStatusCode(fasthttp.StatusInternalServerError)
+		fmt.Fprintf(ctx, "ERROR: Failed to generate auth tokens\n")
+		return
+	}
+	resp, _ := json.Marshal(
+		map[string]string{"token": token, "name": user_pointer.Name})
+	fmt.Fprintf(ctx, "%s\n", string(resp))
+	ctx.SetContentType("application/json")
 	ctx.SetStatusCode(fasthttp.StatusAccepted)
 }

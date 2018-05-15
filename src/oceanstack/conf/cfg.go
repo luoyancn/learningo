@@ -58,7 +58,7 @@ func over_write_default_section() {
 
 func set_database_section() {
 	viper.SetDefault("database.connection",
-		"golang:golang@tcp(127.0.0.1:3306)/golang?parseTime=true")
+		"golang:golang@tcp(127.0.0.1:3306)/golang?parseTime=true&loc=Local")
 	viper.SetDefault("database.max_time_min", 30*time.Minute)
 	viper.SetDefault("database.max_idle", 30)
 	viper.SetDefault("database.max_open", 30)
@@ -81,6 +81,7 @@ func set_redis_section() {
 	viper.SetDefault("redis.max_conn_lifetime", 10*time.Minute)
 	viper.SetDefault("redis.idle_timeout", 10*time.Minute)
 	viper.SetDefault("redis.database", 0)
+	viper.SetDefault("redis.expire", 30*60)
 }
 
 func over_write_redis_section() {
@@ -92,6 +93,7 @@ func over_write_redis_section() {
 	REDIS_IDLE_TIMEOUT = viper.GetDuration(
 		"redis.idle_timeout") * time.Minute
 	REDIS_DATABASE = viper.GetInt("redis.database")
+	REDIS_EXPIRE = viper.GetInt("redis.expire") * 60
 }
 
 func set_kubernetes_section() {

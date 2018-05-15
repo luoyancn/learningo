@@ -7,15 +7,16 @@ import (
 	"time"
 
 	"github.com/gomodule/redigo/redis"
+	uuid "github.com/satori/go.uuid"
 )
 
 var once sync.Once
-var REDIS_POOL redis.Pool
+var redis_pool redis.Pool
 
 func InitRedisConnection() {
 	var err error
 	once.Do(func() {
-		REDIS_POOL = redis.Pool{
+		redis_pool = redis.Pool{
 			MaxIdle:         conf.REDIS_MAX_IDLE,
 			MaxActive:       conf.REDIS_MAX_ACTIVE,
 			MaxConnLifetime: conf.REDIS_MAX_CONN_LIFETIME,
@@ -43,4 +44,30 @@ func InitRedisConnection() {
 			},
 		}
 	})
+}
+
+func TokenIssue(userinfo string) (string, error) {
+	token := uuid.NewV4().String()
+	conn := redis_pool.Get()
+	defer conn.Close()
+	_, err := conn.Do("SETEX", token, conf.REDIS_EXPIRE, userinfo)
+	if nil != err {
+		return "", err
+	}
+	return token, nil
+}
+
+func ValidToken(token string) bool {
+	conn := redis_pool.Get()
+	defer conn.Close()
+	reply, err := conn.Do("GET", token)
+	if nil != err {
+		logging.LOG.Errorf("ERROR:%v\n", err)
+		return false
+	}
+	if _, err = redis.String(reply, err); nil != err {
+		logging.LOG.Errorf("ERROR:%v\n", err)
+		return false
+	}
+	return true
 }

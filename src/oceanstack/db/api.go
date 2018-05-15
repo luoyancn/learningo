@@ -1,14 +1,13 @@
 package db
 
 import (
-	"encoding/json"
 	"oceanstack/exceptions"
 	"oceanstack/logging"
 
 	"github.com/jinzhu/gorm"
 )
 
-func UserGet(username string, userpass string) (string, error) {
+func UserGet(username string, userpass string) (*User, error) {
 	var user User
 	if err := orm_db.Where(
 		"name= ? and password = ?",
@@ -16,22 +15,18 @@ func UserGet(username string, userpass string) (string, error) {
 		logging.LOG.Errorf("Error:%v", err)
 		switch err {
 		case gorm.ErrRecordNotFound:
-			return "", exceptions.NewNotFoundException("User cannot be found.")
+			return nil, exceptions.NewNotFoundException("User cannot be found.")
 		case gorm.ErrCantStartTransaction:
 		case gorm.ErrInvalidSQL:
 		case gorm.ErrInvalidTransaction:
-			return "", exceptions.NewSQLException("There were errors in sql")
+			return nil, exceptions.NewSQLException("There were errors in sql")
 		case gorm.ErrUnaddressable:
-			return "", exceptions.NewConnectionException(err.Error())
+			return nil, exceptions.NewConnectionException(err.Error())
 		default:
-			return "", exceptions.NewException(err.Error())
+			return nil, exceptions.NewException(err.Error())
 		}
 	}
-	user_json, err := json.Marshal(user)
-	if nil != err {
-		return "", exceptions.NewJsonMarshallException(err.Error())
-	}
-	return string(user_json), nil
+	return &user, nil
 }
 
 func UserCreate(user User) (string, error) {

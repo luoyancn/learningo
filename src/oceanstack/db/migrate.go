@@ -22,6 +22,9 @@ func InitDbConnection() {
 			logging.LOG.Panicf("Cannot init database connection:%v\n", err)
 		}
 		orm_db.LogMode(conf.DATABASE_DEBUG_MODE)
+		orm_db.Set("gorm:table_options", "ENGINE=InnoDB").Set(
+			"gorm:table_options", "character set=utf8").Set(
+			"gorm:table_options", "collate=utf8_general_ci")
 		orm_db.DB().SetConnMaxLifetime(
 			conf.DATABASE_MAX_TIME_MIN)
 		orm_db.DB().SetMaxIdleConns(conf.DATABASE_MAX_IDLE)
@@ -31,10 +34,7 @@ func InitDbConnection() {
 
 func MigrateDB() {
 	InitDbConnection()
-	orm_db.Set("gorm:table_options", "ENGINE=InnoDB").Set(
-		"gorm:table_options", "character set=utf8").Set(
-		"gorm:table_options", "collate=utf8_general_ci").AutoMigrate(
-		&User{}, &Role{}, &Assignment{})
+	orm_db.AutoMigrate(&User{}, &Role{}, &Assignment{})
 	orm_db.Model(&Assignment{}).AddForeignKey(
 		"user_uuid", "users(uuid)", "RESTRICT", "RESTRICT")
 	orm_db.Model(&Assignment{}).AddForeignKey(

@@ -16,7 +16,7 @@ var (
 	LISTEN      = "127.0.0.1:8888"
 
 	// Global [database] configurations
-	DATABASE_CONNECTION   = "golang:golang@tcp(127.0.0.1:3306)/golang?parseTime=true"
+	DATABASE_CONNECTION   = "golang:golang@tcp(127.0.0.1:3306)/golang?parseTime=true&loc=Local"
 	DATABASE_MAX_TIME_MIN = 30 * time.Minute
 	DATABASE_MAX_IDLE     = 30
 	DATABASE_MAX_OPEN     = 30
@@ -29,6 +29,7 @@ var (
 	REDIS_MAX_CONN_LIFETIME = 10 * time.Minute
 	REDIS_IDLE_TIMEOUT      = 10 * time.Minute
 	REDIS_DATABASE          = 0
+	REDIS_EXPIRE            = 30 * 60
 
 	// Ca configurations in [ca] section
 	CA_TEMPLATE_PATH = ""

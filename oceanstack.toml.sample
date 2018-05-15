@@ -17,8 +17,9 @@
 
 [database]
 
-# The database connection configuration. Default is localhost.
-# connection = "golang:golang@tcp(127.0.0.1:3306)/golang?parseTime=true"
+# The database connection configuration. loc=Local mean format time with local timezone.
+# If UTC is prefered, delete the loc params. Default is localhost.
+# connection = "golang:golang@tcp(127.0.0.1:3306)/golang?parseTime=true&loc=Local"
 
 # The max life time of database connection. Default is 30 minutes.
 # max_time_min = 30
@@ -51,3 +52,6 @@
 
 # The database of used in redis. Default is 0
 # database = 0
+
+# The expire of object in redis. Default is 30 minutes
+# expire = 30

@@ -2,6 +2,8 @@ package middleware
 
 import (
 	"oceanstack/conf"
+	"oceanstack/db/redisdb"
+	"oceanstack/logging"
 
 	"github.com/valyala/fasthttp"
 )
@@ -16,7 +18,8 @@ func AuthMidddle(next fasthttp.RequestHandler) fasthttp.RequestHandler {
 				fasthttp.StatusUnauthorized)
 			return
 		}
-		if conf.ADMIN_TOKEN != auth_token {
+		logging.LOG.Debugf("The token is :%s\n", auth_token)
+		if conf.ADMIN_TOKEN != auth_token && !redisdb.ValidToken(auth_token) {
 			ctx.Error(fasthttp.StatusMessage(fasthttp.StatusForbidden),
 				fasthttp.StatusForbidden)
 			return
