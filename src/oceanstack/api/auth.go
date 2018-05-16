@@ -7,6 +7,7 @@ import (
 	"oceanstack/db/redisdb"
 	"oceanstack/exceptions"
 	"oceanstack/logging"
+	"oceanstack/rpc"
 	"oceanstack/utils"
 
 	"github.com/valyala/fasthttp"
@@ -48,5 +49,7 @@ func authentication(ctx *fasthttp.RequestCtx) {
 	resp, _ := json.Marshal(
 		map[string]string{"token": token, "name": user_pointer.Name})
 	fmt.Fprintf(ctx, "%s\n", string(resp))
+	res := rpc.GrpcClient()
+	logging.LOG.Noticef("%v\n", res.GetResp())
 	ctx.SetStatusCode(fasthttp.StatusAccepted)
 }

@@ -1,6 +1,7 @@
 package conf
 
 import (
+	"runtime"
 	"sync"
 	"time"
 
@@ -20,6 +21,7 @@ func init() {
 		set_calico_section()
 		set_docker_section()
 		set_ca_section()
+		set_rpc_section()
 	})
 }
 
@@ -33,6 +35,7 @@ func OverWriteConf() {
 		over_write_calico_section()
 		over_write_docker_section()
 		over_write_ca_section()
+		over_write_rpc_section()
 	})
 }
 
@@ -94,6 +97,18 @@ func over_write_redis_section() {
 		"redis.idle_timeout") * time.Minute
 	REDIS_DATABASE = viper.GetInt("redis.database")
 	REDIS_EXPIRE = viper.GetInt("redis.expire") * 60
+}
+
+func set_rpc_section() {
+	viper.SetDefault("rpc.address", "127.0.0.1")
+	viper.SetDefault("rpc.port", 36000)
+	viper.SetDefault("rpc.workers", runtime.NumCPU()-1)
+}
+
+func over_write_rpc_section() {
+	RPC_ADDRESS = viper.GetString("rpc.address")
+	RPC_PORT = viper.GetInt("rpc.port")
+	RPC_WORKERS = viper.GetInt("rpc.workers")
 }
 
 func set_kubernetes_section() {

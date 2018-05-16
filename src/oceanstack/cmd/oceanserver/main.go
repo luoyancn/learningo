@@ -8,9 +8,7 @@ import (
 	"oceanstack/db/redisdb"
 	"oceanstack/logging"
 	"os"
-	"os/signal"
 	"sync"
-	"syscall"
 
 	"github.com/spf13/cobra"
 )
@@ -55,19 +53,8 @@ func serve(cmd *cobra.Command, args []string) {
 	db.InitDbConnection()
 	redisdb.InitRedisConnection()
 	logging.LOG.Infof("Ocean Server started, and listen on %s\n", conf.LISTEN)
-	go stop()
+	go common.Stop()
 	api.Serve()
-}
-
-func stop() {
-	sig := make(chan os.Signal)
-	signal.Notify(sig, syscall.SIGHUP, syscall.SIGINT,
-		syscall.SIGTERM, syscall.SIGQUIT)
-	select {
-	case s := <-sig:
-		logging.LOG.Infof("Exit Ocean Server: Recived signal %s", s)
-		os.Exit(0)
-	}
 }
 
 func get_version(cmd *cobra.Command, args []string) {
