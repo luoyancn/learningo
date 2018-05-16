@@ -32,9 +32,10 @@ var (
 	REDIS_EXPIRE            = 30 * 60
 
 	// Global [rpc] configurations
-	RPC_ADDRESS = "127.0.0.1"
+	RPC_SERVER  = "127.0.0.1"
 	RPC_PORT    = 36000
 	RPC_WORKERS = 1
+	RPC_TIMEOUT = 5 * time.Second
 
 	// Ca configurations in [ca] section
 	CA_TEMPLATE_PATH = ""

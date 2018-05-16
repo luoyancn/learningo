@@ -50,15 +50,17 @@ func StopServer() {
 
 func GrpcClient() *Response {
 	conn, err := grpc.Dial(fmt.Sprintf("%s:%d",
-		conf.RPC_ADDRESS, conf.RPC_PORT), grpc.WithInsecure())
+		conf.RPC_SERVER, conf.RPC_PORT), grpc.WithInsecure())
 	if nil != err {
 		logging.LOG.Errorf("Failed to connect grpc server on %s:%d, %v\n",
-			conf.RPC_ADDRESS, conf.RPC_PORT, err)
+			conf.RPC_SERVER, conf.RPC_PORT, err)
 		return nil
 	}
 	defer conn.Close()
 	client := NewReQRePClient(conn)
-	resp, err := client.GetResp(context.Background(), &Request{Req: "luoyan"})
+	ctx, cancle := context.WithTimeout(context.Background(), conf.RPC_TIMEOUT)
+	defer cancle()
+	resp, err := client.GetResp(ctx, &Request{Req: "luoyan"})
 	if nil != err {
 		logging.LOG.Errorf("RPC ERROR:%v\n", err)
 		return nil

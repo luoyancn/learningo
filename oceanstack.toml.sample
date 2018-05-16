@@ -55,3 +55,16 @@
 
 # The expire of object in redis. Default is 30 minutes
 # expire = 30
+
+[rpc]
+# The rpc server address. Default is 127.0.0.1.
+# server = "127.0.0.1"
+
+# The rpc server port listen. Default is 36000.
+# port = 36000
+
+# The workers of rpc server gorouting. Default is CPU - 1.
+# workers =
+
+# The timeout of rpc request. Default is 10 seconds.
+# timeout = 10

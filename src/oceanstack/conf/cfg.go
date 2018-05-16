@@ -45,7 +45,7 @@ func set_default_section() {
 	viper.SetDefault("default.log_path", "/var/log/oceanstack")
 	viper.SetDefault("default.admin_token", "ADMIN_TOKEN")
 	viper.SetDefault("default.ssh_port", 22)
-	viper.SetDefault("default.ssh_timeout", 5*time.Second)
+	viper.SetDefault("default.ssh_timeout", 5)
 	viper.SetDefault("default.listen", "127.0.0.1:8888")
 }
 
@@ -55,14 +55,14 @@ func over_write_default_section() {
 	LOGPATH = viper.GetString("default.log_path")
 	ADMIN_TOKEN = viper.GetString("default.admin_token")
 	SSH_PORT = viper.GetInt("default.ssh_port")
-	SSH_TIMEOUT = viper.GetDuration("default.ssh_timeout")
+	SSH_TIMEOUT = viper.GetDuration("default.ssh_timeout") * time.Second
 	LISTEN = viper.GetString("default.listen")
 }
 
 func set_database_section() {
 	viper.SetDefault("database.connection",
 		"golang:golang@tcp(127.0.0.1:3306)/golang?parseTime=true&loc=Local")
-	viper.SetDefault("database.max_time_min", 30*time.Minute)
+	viper.SetDefault("database.max_time_min", 30)
 	viper.SetDefault("database.max_idle", 30)
 	viper.SetDefault("database.max_open", 30)
 	viper.SetDefault("database.debug_mode", false)
@@ -81,8 +81,8 @@ func set_redis_section() {
 	viper.SetDefault("redis.connection", "127.0.0.1:6379")
 	viper.SetDefault("redis.max_idle", 30)
 	viper.SetDefault("redis.max_active", 30)
-	viper.SetDefault("redis.max_conn_lifetime", 10*time.Minute)
-	viper.SetDefault("redis.idle_timeout", 10*time.Minute)
+	viper.SetDefault("redis.max_conn_lifetime", 10)
+	viper.SetDefault("redis.idle_timeout", 10)
 	viper.SetDefault("redis.database", 0)
 	viper.SetDefault("redis.expire", 30*60)
 }
@@ -100,15 +100,17 @@ func over_write_redis_section() {
 }
 
 func set_rpc_section() {
-	viper.SetDefault("rpc.address", "127.0.0.1")
+	viper.SetDefault("rpc.server", "127.0.0.1")
 	viper.SetDefault("rpc.port", 36000)
 	viper.SetDefault("rpc.workers", runtime.NumCPU()-1)
+	viper.SetDefault("rpc.timeout", 5)
 }
 
 func over_write_rpc_section() {
-	RPC_ADDRESS = viper.GetString("rpc.address")
+	RPC_SERVER = viper.GetString("rpc.server")
 	RPC_PORT = viper.GetInt("rpc.port")
 	RPC_WORKERS = viper.GetInt("rpc.workers")
+	RPC_TIMEOUT = viper.GetDuration("rpc.timeout") * time.Second
 }
 
 func set_kubernetes_section() {
