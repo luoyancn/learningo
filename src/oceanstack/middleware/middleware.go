@@ -41,6 +41,13 @@ func JsonMiddleware(next fasthttp.RequestHandler) fasthttp.RequestHandler {
 	})
 }
 
+func JsonResponseMiddleware(next fasthttp.RequestHandler) fasthttp.RequestHandler {
+	return fasthttp.RequestHandler(func(ctx *fasthttp.RequestCtx) {
+		next(ctx)
+		ctx.SetContentType("application/json")
+	})
+}
+
 func BuildPipeLine(app fasthttp.RequestHandler,
 	mid ...middleware) fasthttp.RequestHandler {
 	if 0 == len(mid) {

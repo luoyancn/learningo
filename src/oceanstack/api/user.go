@@ -35,7 +35,6 @@ func user_create(ctx *fasthttp.RequestCtx) {
 	resp, _ := json.Marshal(
 		map[string]string{"uuid": uuid, "name": user.Name})
 	fmt.Fprintf(ctx, "%s\n", string(resp))
-	ctx.SetContentType("application/json")
 	ctx.SetStatusCode(fasthttp.StatusCreated)
 }
 

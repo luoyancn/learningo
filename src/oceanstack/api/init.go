@@ -61,14 +61,16 @@ func init() {
 	router = fasthttprouter.New()
 	router.GET("/", root)
 	router.POST("/auth", middleware.BuildPipeLine(
-		authentication, middleware.JsonMiddleware))
+		authentication, middleware.JsonMiddleware,
+		middleware.JsonResponseMiddleware))
 
 	router.GET("/users", middleware.BuildPipeLine(
 		user_list, middleware.AuthMidddle))
 	router.GET("/users/:userid", middleware.BuildPipeLine(
 		user_get, middleware.AuthMidddle))
 	router.POST("/users", middleware.BuildPipeLine(
-		user_create, middleware.JsonMiddleware, middleware.AuthMidddle))
+		user_create, middleware.JsonMiddleware, middleware.AuthMidddle,
+		middleware.JsonResponseMiddleware))
 	router.PUT("/users/:userid", middleware.BuildPipeLine(
 		user_update, middleware.JsonMiddleware, middleware.AuthMidddle))
 	router.DELETE("/users/:userid", middleware.BuildPipeLine(

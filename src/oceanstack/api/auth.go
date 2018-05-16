@@ -48,6 +48,5 @@ func authentication(ctx *fasthttp.RequestCtx) {
 	resp, _ := json.Marshal(
 		map[string]string{"token": token, "name": user_pointer.Name})
 	fmt.Fprintf(ctx, "%s\n", string(resp))
-	ctx.SetContentType("application/json")
 	ctx.SetStatusCode(fasthttp.StatusAccepted)
 }
