@@ -6,6 +6,7 @@ import (
 	"oceanstack/conf"
 	"oceanstack/logging"
 	"sync"
+	"time"
 
 	empty "github.com/golang/protobuf/ptypes/empty"
 	context "golang.org/x/net/context"
@@ -31,6 +32,20 @@ func (this *Server) Cast(ctx context.Context,
 var once sync.Once
 var GRPC *grpc.Server
 
+func WithServerInterceptor() grpc.ServerOption {
+	return grpc.UnaryInterceptor(serverInterceptor)
+}
+
+func serverInterceptor(ctx context.Context, req interface{},
+	info *grpc.UnaryServerInfo, handler grpc.UnaryHandler) (
+	interface{}, error) {
+	start := time.Now()
+	resp, err := handler(ctx, req)
+	logging.LOG.Infof("invoke server method=%s duration=%s error=%v",
+		info.FullMethod, time.Since(start), err)
+	return resp, err
+}
+
 func StartServer() {
 	once.Do(func() {
 		listener, err := net.Listen(
@@ -40,7 +55,7 @@ func StartServer() {
 				"Failed to start grpc server on 0.0.0.0:%d, %v\n",
 				conf.GRPC_PORT, err)
 		}
-		GRPC = grpc.NewServer()
+		GRPC = grpc.NewServer(WithServerInterceptor())
 		RegisterReQRePServer(GRPC, &Server{})
 		GRPC.Serve(listener)
 		logging.LOG.Infof("Grpc Server started on 0.0.0.0:%d\n",
@@ -72,8 +87,23 @@ func InitGrpcClientPool() {
 	})
 }
 
+func WithClientInterceptor() grpc.DialOption {
+	return grpc.WithUnaryInterceptor(clientInterceptor)
+}
+
+func clientInterceptor(ctx context.Context, method string, req interface{},
+	reply interface{}, cc *grpc.ClientConn, invoker grpc.UnaryInvoker,
+	opts ...grpc.CallOption) error {
+	start := time.Now()
+	err := invoker(ctx, method, req, reply, cc, opts...)
+	logging.LOG.Infof("invoke remote method=%s duration=%s error=%v",
+		method, time.Since(start), err)
+	return err
+}
+
 func (this *grpcPool) dialNew() *grpc.ClientConn {
-	conn, err := grpc.Dial(this.addr, grpc.WithInsecure(), grpc.WithInsecure())
+	conn, err := grpc.Dial(this.addr, grpc.WithInsecure(),
+		grpc.WithInsecure(), WithClientInterceptor())
 	if nil != err {
 		logging.LOG.Errorf("RPC ERROR:%v\n", err)
 		return nil
