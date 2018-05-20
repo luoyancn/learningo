@@ -21,7 +21,8 @@ func init() {
 		set_calico_section()
 		set_docker_section()
 		set_ca_section()
-		set_rpc_section()
+		set_grpc_section()
+		set_api_section()
 	})
 }
 
@@ -35,7 +36,8 @@ func OverWriteConf() {
 		over_write_calico_section()
 		over_write_docker_section()
 		over_write_ca_section()
-		over_write_rpc_section()
+		over_write_grpc_section()
+		over_write_api_section()
 	})
 }
 
@@ -46,7 +48,6 @@ func set_default_section() {
 	viper.SetDefault("default.admin_token", "ADMIN_TOKEN")
 	viper.SetDefault("default.ssh_port", 22)
 	viper.SetDefault("default.ssh_timeout", 5)
-	viper.SetDefault("default.listen", "127.0.0.1:8888")
 }
 
 func over_write_default_section() {
@@ -56,7 +57,6 @@ func over_write_default_section() {
 	ADMIN_TOKEN = viper.GetString("default.admin_token")
 	SSH_PORT = viper.GetInt("default.ssh_port")
 	SSH_TIMEOUT = viper.GetDuration("default.ssh_timeout") * time.Second
-	LISTEN = viper.GetString("default.listen")
 }
 
 func set_database_section() {
@@ -99,18 +99,30 @@ func over_write_redis_section() {
 	REDIS_EXPIRE = viper.GetInt("redis.expire") * 60
 }
 
-func set_rpc_section() {
-	viper.SetDefault("rpc.server", "127.0.0.1")
-	viper.SetDefault("rpc.port", 36000)
-	viper.SetDefault("rpc.workers", runtime.NumCPU()-1)
-	viper.SetDefault("rpc.timeout", 5)
+func set_grpc_section() {
+	viper.SetDefault("grpc.server", "127.0.0.1")
+	viper.SetDefault("grpc.port", 36000)
+	viper.SetDefault("grpc.workers", runtime.NumCPU()-1)
+	viper.SetDefault("grpc.timeout", 5)
+	viper.SetDefault("grpc.pool_size", 10)
 }
 
-func over_write_rpc_section() {
-	RPC_SERVER = viper.GetString("rpc.server")
-	RPC_PORT = viper.GetInt("rpc.port")
-	RPC_WORKERS = viper.GetInt("rpc.workers")
-	RPC_TIMEOUT = viper.GetDuration("rpc.timeout") * time.Second
+func over_write_grpc_section() {
+	GRPC_SERVER = viper.GetString("grpc.server")
+	GRPC_PORT = viper.GetInt("grpc.port")
+	GRPC_WORKERS = viper.GetInt("grpc.workers")
+	GRPC_TIMEOUT = viper.GetDuration("grpc.timeout") * time.Second
+	GRPC_POOL_SIZE = viper.GetInt("grpc.pool_size")
+}
+
+func set_api_section() {
+	viper.SetDefault("api.listen", "127.0.0.1:8888")
+	viper.SetDefault("api.workers", runtime.NumCPU()-1)
+}
+
+func over_write_api_section() {
+	API_LISTEN = viper.GetString("api.listen")
+	API_WORKERS = viper.GetInt("api.workers")
 }
 
 func set_kubernetes_section() {

@@ -3,10 +3,10 @@ package main
 import (
 	"oceanstack/api"
 	"oceanstack/common"
-	"oceanstack/conf"
 	"oceanstack/db"
 	"oceanstack/db/redisdb"
 	"oceanstack/logging"
+	"oceanstack/rpc"
 	"os"
 	"sync"
 
@@ -52,9 +52,9 @@ func serve(cmd *cobra.Command, args []string) {
 	common.ReadConfig(configfile, "oceanserver", logging.FILE_ENABLED)
 	db.InitDbConnection()
 	redisdb.InitRedisConnection()
-	logging.LOG.Infof("Ocean Server started, and listen on %s\n", conf.LISTEN)
-	go common.Stop()
+	rpc.InitGrpcClientPool()
 	api.Serve()
+	common.Wait()
 }
 
 func get_version(cmd *cobra.Command, args []string) {

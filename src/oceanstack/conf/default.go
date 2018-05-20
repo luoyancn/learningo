@@ -13,7 +13,6 @@ var (
 	ADMIN_TOKEN = "ADMIN_TOKEN"
 	SSH_PORT    = 22
 	SSH_TIMEOUT = 5 * time.Second
-	LISTEN      = "127.0.0.1:8888"
 
 	// Global [database] configurations
 	DATABASE_CONNECTION   = "golang:golang@tcp(127.0.0.1:3306)/golang?parseTime=true&loc=Local"
@@ -31,11 +30,16 @@ var (
 	REDIS_DATABASE          = 0
 	REDIS_EXPIRE            = 30 * 60
 
+	// Global [api] configurations
+	API_LISTEN  = "127.0.0.1:8888"
+	API_WORKERS = 1
+
 	// Global [rpc] configurations
-	RPC_SERVER  = "127.0.0.1"
-	RPC_PORT    = 36000
-	RPC_WORKERS = 1
-	RPC_TIMEOUT = 5 * time.Second
+	GRPC_SERVER    = "127.0.0.1"
+	GRPC_PORT      = 36000
+	GRPC_WORKERS   = 1
+	GRPC_TIMEOUT   = 5 * time.Second
+	GRPC_POOL_SIZE = 10
 
 	// Ca configurations in [ca] section
 	CA_TEMPLATE_PATH = ""

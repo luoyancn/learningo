@@ -8,9 +8,6 @@
 # The full path of log file. Default is /var/log/oceanstack.
 # log_path = "/var/log/oceanstack"
 
-# The api server bind address and port. Default is 127.0.0.1:8888
-# listen = "127.0.0.1:8888"
-
 # The global management admin token. Default is ADMIN_TOKEN.
 # Please change this params with uuid or md5 string
 # admin_token = "ADMIN_TOKEN"
@@ -56,15 +53,25 @@
 # The expire of object in redis. Default is 30 minutes
 # expire = 30
 
-[rpc]
-# The rpc server address. Default is 127.0.0.1.
+[grpc]
+# The grpc server address. Default is 127.0.0.1.
 # server = "127.0.0.1"
 
-# The rpc server port listen. Default is 36000.
+# The grpc server port listen. Default is 36000.
 # port = 36000
 
-# The workers of rpc server gorouting. Default is CPU - 1.
+# The workers of grpc server gorouting. Default is CPU - 1.
 # workers =
 
-# The timeout of rpc request. Default is 10 seconds.
+# The timeout of grpc request. Default is 10 seconds.
 # timeout = 10
+
+# The pool size of grpc clients. Default is 10.
+# pool_size = 10
+
+[api]
+# The api server bind address and port. Default is 127.0.0.1:8888
+# listen = "127.0.0.1:8888"
+
+# The workers of api server gorouting. Default is CPU - 1.
+# workers =

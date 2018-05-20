@@ -12,7 +12,7 @@ import (
 func ReadConfig(conf_path string, logger string, logbak int) {
 	viper.SetConfigFile(conf_path)
 	if err := viper.ReadInConfig(); nil != err {
-		fmt.Printf("ERROR:%v\n", err)
+		fmt.Printf("Failed to read config file %s: %v\n", conf_path, err)
 		os.Exit(-1)
 	}
 	conf.OverWriteConf()

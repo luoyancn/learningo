@@ -82,5 +82,7 @@ func root(ctx *fasthttp.RequestCtx) {
 }
 
 func Serve() {
-	fasthttp.ListenAndServe(conf.LISTEN, router.Handler)
+	logging.LOG.Infof(
+		"Ocean Server started, and listen on %s\n", conf.API_LISTEN)
+	go fasthttp.ListenAndServe(conf.API_LISTEN, router.Handler)
 }

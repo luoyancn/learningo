@@ -47,9 +47,9 @@ func init() {
 
 func start(cmd *cobra.Command, args []string) {
 	common.ReadConfig(configfile, "oceanengine", logging.FILE_ENABLED)
+	go rpc.StartServer()
 	logging.LOG.Infof("Ocean engine started\n")
-	go common.Stop()
-	rpc.StartServer()
+	common.Wait()
 }
 
 func get_version(cmd *cobra.Command, args []string) {

@@ -1,5 +1,6 @@
 syntax = "proto3";
 package rpc;
+import "google/protobuf/empty.proto";
 message Request{
     string req = 1;
 }
@@ -10,4 +11,5 @@ message Response{
 
 service ReQReP{
     rpc GetResp(Request) returns (Response);
+    rpc Cast(Request) returns (google.protobuf.Empty);
 }
