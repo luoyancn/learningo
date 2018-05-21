@@ -105,6 +105,11 @@ func set_grpc_section() {
 	viper.SetDefault("grpc.workers", runtime.NumCPU()-1)
 	viper.SetDefault("grpc.timeout", 5)
 	viper.SetDefault("grpc.pool_size", 10)
+	viper.SetDefault("grpc.concurrency", 64)
+	viper.SetDefault("grpc.server_conn_limits", 1024)
+	viper.SetDefault("grpc.server_req_max_frequency", 1024)
+	viper.SetDefault("grpc.server_req_burst_frequency", 10)
+	viper.SetDefault("grpc.req_msg_size", 1)
 }
 
 func over_write_grpc_section() {
@@ -113,6 +118,13 @@ func over_write_grpc_section() {
 	GRPC_WORKERS = viper.GetInt("grpc.workers")
 	GRPC_TIMEOUT = viper.GetDuration("grpc.timeout") * time.Second
 	GRPC_POOL_SIZE = viper.GetInt("grpc.pool_size")
+	GRPC_CONCURRENCY = viper.GetInt("grpc.concurrency")
+	GRPC_SERVER_CONN_LIMITS = viper.GetInt("grpc.server_conn_limits")
+	GRPC_SERVER_REQ_MAX_FREQUENCY = viper.GetFloat64(
+		"grpc.server_req_max_frequency")
+	GRPC_SERVER_REQ_BURST_FREQUENCY = viper.GetInt(
+		"grpc.server_req_burst_frequency")
+	GRPC_REQ_MSG_SIZE = viper.GetInt("grpc.req_msg_size") * 1024 * 1024
 }
 
 func set_api_section() {

@@ -69,6 +69,21 @@
 # The pool size of grpc clients. Default is 10.
 # pool_size = 10
 
+# The concurrency stream of per grpc connection. Default is 64.
+# concurrency = 64
+
+# The max connection of grpc server. Default is 1024.
+# server_conn_limits = 1024
+
+# The request frequency of grpc server. Default is 1024 times per second.
+# server_req_max_frequency = 1024
+
+# The burst frequency of grpc server. Default is 5.
+# server_req_burst_frequency = 5
+
+# The body of message body in grpc. Default is 1MB.
+# req_msg_size = 1
+
 [api]
 # The api server bind address and port. Default is 127.0.0.1:8888
 # listen = "127.0.0.1:8888"

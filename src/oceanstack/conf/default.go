@@ -35,11 +35,16 @@ var (
 	API_WORKERS = 1
 
 	// Global [rpc] configurations
-	GRPC_SERVER    = "127.0.0.1"
-	GRPC_PORT      = 36000
-	GRPC_WORKERS   = 1
-	GRPC_TIMEOUT   = 5 * time.Second
-	GRPC_POOL_SIZE = 10
+	GRPC_SERVER                     = "127.0.0.1"
+	GRPC_PORT                       = 36000
+	GRPC_WORKERS                    = 1
+	GRPC_TIMEOUT                    = 5 * time.Second
+	GRPC_POOL_SIZE                  = 10
+	GRPC_CONCURRENCY                = 64
+	GRPC_SERVER_CONN_LIMITS         = 1024
+	GRPC_SERVER_REQ_MAX_FREQUENCY   = 1024.00
+	GRPC_SERVER_REQ_BURST_FREQUENCY = 10
+	GRPC_REQ_MSG_SIZE               = 1 * 1024 * 1024
 
 	// Ca configurations in [ca] section
 	CA_TEMPLATE_PATH = ""
