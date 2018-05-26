@@ -45,6 +45,14 @@ var (
 	GRPC_SERVER_REQ_MAX_FREQUENCY   = 1024.00
 	GRPC_SERVER_REQ_BURST_FREQUENCY = 10
 	GRPC_REQ_MSG_SIZE               = 1 * 1024 * 1024
+	GRPC_ENABLE_LB                  = false
+	GRPC_LB_LISTEN                  = "127.0.0.1:9000"
+	GRPC_ETCD_ENDPOINTS             = []string{}
+	GRPC_ETCD_SERVICE_NAME          = "oceanstack"
+	GRPC_ETCD_CA                    = ""
+	GRPC_ETCD_CERT                  = ""
+	GRPC_ETCD_KEY                   = ""
+	GRPC_ETCD_TIMEOUT               = 10 * time.Second
 
 	// Ca configurations in [ca] section
 	CA_TEMPLATE_PATH = ""
