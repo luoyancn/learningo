@@ -30,7 +30,35 @@ func (this *Server) GetResp(
 
 func (this *Server) Cast(ctx context.Context,
 	req *Request) (*empty.Empty, error) {
+	ticker := time.After(30 * time.Second)
+	go func() {
+		for {
+			select {
+			case <-ticker:
+				logging.LOG.Noticef("Time out after 30 second\n")
+				return
+			default:
+				logging.LOG.Infof("waiting for timeout\n")
+				time.Sleep(time.Second * 1)
+			}
+		}
+	}()
 	return &empty.Empty{}, nil
+}
+
+// send message from server with stream format
+func (this *Server) StreamReq(s_server ReQReP_StreamReqServer) error {
+	s_server.Send(&Response{Resp: "lucifer"})
+	return nil
+}
+
+func (this *Server) StreamRep(
+	req *Request, s_server ReQReP_StreamRepServer) error {
+	return nil
+}
+
+func (this *Server) StreamReqRep(s_server ReQReP_StreamReqRepServer) error {
+	return nil
 }
 
 /****************************************************************************/
@@ -51,16 +79,16 @@ func serverInterceptor(ctx context.Context, req interface{},
 	return resp, err
 }
 
-type Tap struct {
+type tapp struct {
 	lim *rate.Limiter
 }
 
 // 限制访问频率。默认1024次/秒
-func NewTap() *Tap {
-	return &Tap{rate.NewLimiter(rate.Limit(conf.GRPC_SERVER_REQ_MAX_FREQUENCY),
+func newTap() *tapp {
+	return &tapp{rate.NewLimiter(rate.Limit(conf.GRPC_SERVER_REQ_MAX_FREQUENCY),
 		conf.GRPC_SERVER_REQ_BURST_FREQUENCY)}
 }
-func (t *Tap) Handler(ctx context.Context,
+func (t *tapp) handler(ctx context.Context,
 	info *tap.Info) (context.Context, error) {
 	if !t.lim.Allow() {
 		return nil, status.Errorf(
@@ -81,7 +109,7 @@ func StartServer() {
 		// grpc.MaxConcurrentStreams限定每个grpc连接可以有多少个并发
 		GRPC = grpc.NewServer(withServerInterceptor(),
 			grpc.MaxConcurrentStreams(uint32(conf.GRPC_CONCURRENCY)),
-			grpc.InTapHandle(NewTap().Handler))
+			grpc.InTapHandle(newTap().handler))
 		RegisterReQRePServer(GRPC, &Server{})
 		// netutil.LimitListener限定总共可以对外提供多少连接
 		limit_lister := netutil.LimitListener(
@@ -173,4 +201,25 @@ func GrpcClient() *Response {
 		return nil
 	}
 	return resp
+}
+
+func GrpcCast() {
+	ctx, cancle := context.WithTimeout(context.Background(), conf.GRPC_TIMEOUT)
+	defer cancle()
+	conn := pool.get()
+	defer pool.put(conn)
+	client := NewReQRePClient(conn)
+	_, err := client.Cast(ctx, &Request{Req: "zhangjl"})
+	if nil != err {
+		logging.LOG.Errorf("Grpc Cast Error: %v\n", err)
+	}
+}
+
+func ReciveStreamReq() {
+	ctx, cancle := context.WithTimeout(context.Background(), conf.GRPC_TIMEOUT)
+	defer cancle()
+	conn := pool.get()
+	defer pool.put(conn)
+	client := NewReQRePClient(conn)
+	client.StreamReq()
 }

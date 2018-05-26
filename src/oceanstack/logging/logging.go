@@ -18,7 +18,7 @@ var format_std = gologging.MustStringFormatter(
 )
 
 var format_file = gologging.MustStringFormatter(
-	"%{time:2006-01-02 15:04:05.999} [%{level:.8s}] " +
+	"%{time:2006-01-02 15:04:05.999} [%{level:.8s}] [pid:%{pid}] " +
 		" [%{shortfile}] [%{shortfunc}] %{message}",
 )
 

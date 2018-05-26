@@ -12,7 +12,6 @@ import (
 
 var once sync.Once
 var configfile string
-var logger string
 
 var rootcmd = &cobra.Command{
 	Short: "Manage tools for ocean stack",
