@@ -50,5 +50,8 @@ func authentication(ctx *fasthttp.RequestCtx) {
 		map[string]string{"token": token, "name": user_pointer.Name})
 	fmt.Fprintf(ctx, "%s\n", string(resp))
 	rpc.GrpcCast()
+	rpc.GrpcStreamRequest()
+	rpc.GrpcStreamResponse()
+	rpc.GrpcStreamRequestResponse()
 	ctx.SetStatusCode(fasthttp.StatusAccepted)
 }

@@ -13,7 +13,8 @@ service ReQReP{
     rpc GetResp(Request) returns (Response);
     rpc Cast(Request) returns (google.protobuf.Empty);
 
-	rpc StreamReq(stream Request) returns (Response);
-	rpc StreamRep(Request) returns (stream Response);
-	rpc StreamReqRep(stream Request) returns (stream Response);
+    rpc StreamResponse(Request) returns (stream Response);
+    rpc StreamRequest(stream Request) returns (Response);
+
+    rpc StreamReqRep(stream Request) returns (stream Response);
 }
