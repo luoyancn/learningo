@@ -88,7 +88,7 @@ func set_redis_section() {
 }
 
 func over_write_redis_section() {
-	REDIS_CONNECTION = "127.0.0.1:6379"
+	REDIS_CONNECTION = viper.GetString("redis.connection")
 	REDIS_MAX_IDLE = viper.GetInt("redis.max_idle")
 	REDIS_MAX_ACTIVE = viper.GetInt("redis.max_active")
 	REDIS_MAX_CONN_LIFETIME = viper.GetDuration(
@@ -110,6 +110,14 @@ func set_grpc_section() {
 	viper.SetDefault("grpc.server_req_max_frequency", 1024)
 	viper.SetDefault("grpc.server_req_burst_frequency", 10)
 	viper.SetDefault("grpc.req_msg_size", 1)
+	viper.SetDefault("grpc.enable_lb", false)
+	viper.SetDefault("grpc.lb_listen", "127.0.0.1:9000")
+	viper.SetDefault("grpc.etcd_endpoints", []string{"http//:127.0.0.1:2379"})
+	viper.SetDefault("grpc.service_name", "oceanstack")
+	viper.SetDefault("grpc.etcd_ca", "/etc/etcd/ssl/ca.pem")
+	viper.SetDefault("grpc.etcd_cert", "/etc/etcd/ssl/cert.pem")
+	viper.SetDefault("grpc.etcd_key", "/etc/etcd/ssl/key.pem")
+	viper.SetDefault("grpc.etcd_timeout", 30)
 }
 
 func over_write_grpc_section() {
@@ -125,6 +133,14 @@ func over_write_grpc_section() {
 	GRPC_SERVER_REQ_BURST_FREQUENCY = viper.GetInt(
 		"grpc.server_req_burst_frequency")
 	GRPC_REQ_MSG_SIZE = viper.GetInt("grpc.req_msg_size") * 1024 * 1024
+	GRPC_ENABLE_LB = viper.GetBool("grpc.enable_lb")
+	GRPC_LB_LISTEN = viper.GetString("grpc.lb_listen")
+	GRPC_ETCD_ENDPOINTS = viper.GetStringSlice("grpc.etcd_endpoints")
+	GRPC_ETCD_SERVICE_NAME = viper.GetString("grpc.service_name")
+	GRPC_ETCD_CA = viper.GetString("grpc.etcd_ca")
+	GRPC_ETCD_CERT = viper.GetString("grpc.etcd_cert")
+	GRPC_ETCD_KEY = viper.GetString("grpc.etcd_key")
+	GRPC_ETCD_TIMEOUT = viper.GetDuration("grpc.etcd_timeout") * time.Second
 }
 
 func set_api_section() {

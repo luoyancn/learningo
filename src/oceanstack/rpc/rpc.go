@@ -136,6 +136,11 @@ func StartServer() {
 				"Failed to start grpc server on 0.0.0.0:%d, %v\n",
 				conf.GRPC_PORT, err)
 		}
+		if conf.GRPC_ENABLE_LB {
+			logging.LOG.Infof(
+				"Using load balances mode, try to register service in etcd\n")
+			register()
+		}
 		// grpc.MaxConcurrentStreams限定每个grpc连接可以有多少个并发
 		GRPC = grpc.NewServer(withServerInterceptor(),
 			grpc.StreamInterceptor(streamServerInterceptor),
@@ -153,6 +158,7 @@ func StartServer() {
 
 func StopServer() {
 	logging.LOG.Infof("Terminate the Grpc Server ...\n")
+	unRegister()
 	GRPC.Stop()
 }
 
@@ -200,12 +206,22 @@ func clientstreamClientInterceptor(ctx context.Context, desc *grpc.StreamDesc,
 }
 
 func (this *grpcPool) dialNew() *grpc.ClientConn {
+	var err error
+	var conn *grpc.ClientConn
 	// grpc.MaxCallSendMsgSize 设置客户端最大可以发送的消息体大小。默认为1M.
-	conn, err := grpc.Dial(this.addr, grpc.WithInsecure(),
-		grpc.WithInsecure(), withClientInterceptor(),
+	opts := []grpc.DialOption{grpc.WithInsecure(), withClientInterceptor(),
 		grpc.WithStreamInterceptor(clientstreamClientInterceptor),
 		grpc.WithDefaultCallOptions(
-			grpc.MaxCallSendMsgSize(conf.GRPC_REQ_MSG_SIZE)))
+			grpc.MaxCallSendMsgSize(conf.GRPC_REQ_MSG_SIZE))}
+	if conf.GRPC_ENABLE_LB {
+		resolver_etcd := newResolver(conf.GRPC_ETCD_SERVICE_NAME)
+		balancer_etcd := grpc.RoundRobin(resolver_etcd)
+		opts = append(opts, grpc.WithBalancer(balancer_etcd))
+		conn, err = grpc.DialContext(
+			context.Background(), "http://192.168.137.30:2379", opts...)
+	} else {
+		conn, err = grpc.Dial(this.addr, opts...)
+	}
 	if nil != err {
 		logging.LOG.Errorf("RPC ERROR:%v\n", err)
 		return nil
