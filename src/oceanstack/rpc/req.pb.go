@@ -25,7 +25,7 @@ var _ = math.Inf
 const _ = proto.ProtoPackageIsVersion2 // please upgrade the proto package
 
 type Request struct {
-	Req                  string   `protobuf:"bytes,1,opt,name=req" json:"req,omitempty"`
+	Req                  string   `protobuf:"bytes,1,opt,name=req,proto3" json:"req,omitempty"`
 	XXX_NoUnkeyedLiteral struct{} `json:"-"`
 	XXX_unrecognized     []byte   `json:"-"`
 	XXX_sizecache        int32    `json:"-"`
@@ -63,7 +63,7 @@ func (m *Request) GetReq() string {
 }
 
 type Response struct {
-	Resp                 string   `protobuf:"bytes,1,opt,name=resp" json:"resp,omitempty"`
+	Resp                 string   `protobuf:"bytes,1,opt,name=resp,proto3" json:"resp,omitempty"`
 	XXX_NoUnkeyedLiteral struct{} `json:"-"`
 	XXX_unrecognized     []byte   `json:"-"`
 	XXX_sizecache        int32    `json:"-"`
@@ -247,8 +247,7 @@ func (x *reQRePStreamReqRepClient) Recv() (*Response, error) {
 	return m, nil
 }
 
-// Server API for ReQReP service
-
+// ReQRePServer is the server API for ReQReP service.
 type ReQRePServer interface {
 	GetResp(context.Context, *Request) (*Response, error)
 	Cast(context.Context, *Request) (*empty.Empty, error)

@@ -17,8 +17,10 @@ ocean:
 oceanengine:prepare
 	cd $(GOPATH)/src/oceanstack/cmd/oceanengine && $(BUILD)
 
-prepare:
+prepare:set_proxy
 	protoc --go_out=plugins=grpc:. src/oceanstack/rpc/*.proto
+set_proxy:
+	git config --global http.proxy http://localhost:8123 && export http_proxy=http://localhost:8123 && cd src && govendor sync
 
 .PHONY: clean
 clean:
