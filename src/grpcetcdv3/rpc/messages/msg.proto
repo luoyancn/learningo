@@ -1,0 +1,13 @@
+syntax = "proto3";
+package messages;
+message Request{
+    string req = 1;
+}
+
+message Response{
+    string resp = 1;
+}
+
+service ReQReP{
+    rpc Call(Request) returns (Response);
+}
