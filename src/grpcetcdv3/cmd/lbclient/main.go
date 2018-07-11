@@ -4,8 +4,9 @@ import (
 	"fmt"
 	"os"
 	"sync"
+	"time"
 
-	"grpcetcdv3/rpc"
+	rpc "grpcetcdv3/rpc/rpclient"
 
 	"github.com/spf13/cobra"
 )
@@ -13,7 +14,7 @@ import (
 var startcmd = &cobra.Command{
 	Use:   "start",
 	Short: "Start lb client",
-	Long:  ` Start lb client`,
+	Long:  `Start lb client`,
 	Run:   start,
 	Args:  cobra.NoArgs,
 }
@@ -27,8 +28,9 @@ func init() {
 }
 
 func start(cmd *cobra.Command, args []string) {
-	for i := 0; i < 10; i++ {
+	for {
 		fmt.Printf("%s\n", rpc.Call())
+		time.Sleep(5 * time.Microsecond)
 	}
 }
 
