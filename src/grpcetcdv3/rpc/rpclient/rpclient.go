@@ -1,12 +1,15 @@
-package rpc
+package rpclient
 
 import (
 	"context"
+	"fmt"
 	"sync"
 	"time"
 
+	registry "grpcetcdv3/rpc/etcdv3"
 	"grpcetcdv3/rpc/messages"
 
+	etcd "github.com/coreos/etcd/clientv3"
 	"google.golang.org/grpc"
 )
 
@@ -30,7 +33,13 @@ func InitGrpcClientPool() {
 func (this *grpcPool) dialNew() *grpc.ClientConn {
 	var err error
 	var conn *grpc.ClientConn
-	conn, err = grpc.Dial("localhost:8080", grpc.WithInsecure())
+	config := etcd.Config{
+		Endpoints: []string{"http://localhost:2379"},
+	}
+	resolver := registry.NewResolver("grpc-lb", "zhangjl", config)
+	balancer_etcd := grpc.RoundRobin(resolver)
+	conn, err = grpc.Dial("", grpc.WithInsecure(),
+		grpc.WithBalancer(balancer_etcd), grpc.WithBlock())
 	if nil != err {
 		return nil
 	}
@@ -56,14 +65,15 @@ func (this *grpcPool) put(conn *grpc.ClientConn) error {
 }
 
 func Call() string {
-	ctx, cancle := context.WithTimeout(context.Background(), 10*time.Second)
+	ctx, cancle := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancle()
 	conn := pool.get()
 	defer pool.put(conn)
 	client := messages.NewReQRePClient(conn)
 	resp, err := client.Call(ctx, &messages.Request{Req: "luoyan"})
 	if nil != err {
-		panic(err)
+		fmt.Printf("Failed to get response from grpc server:%v\n", err)
+		return ""
 	}
 	return resp.GetResp()
 }
